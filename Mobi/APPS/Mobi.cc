@@ -110,9 +110,9 @@ int main(int argc, char* argv[]) {
     	fout.close();
     }
 	*/
-    TMScoreBin tm("./TMScore",".");
-    Spacer* sss;
-    tm.tms(prot1.getModel(1), prot1.getModel(2), sss);
+    TMScoreBin tm("TMScore",".");
+    Spacer sss;
+    tm.tms(prot1, 1, 2, sss);
 
 
 

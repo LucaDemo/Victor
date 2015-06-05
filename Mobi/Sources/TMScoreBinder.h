@@ -9,9 +9,10 @@
 #define MOBI_SOURCES_TMSCOREBINDER_H_
 
 #include<Spacer.h>
-#include<Protein.h>
+#include<ProteinModel.h>
 
 using namespace Victor::Biopool;
+using namespace Victor::Mobi;
 
 namespace Victor { namespace Mobi {
 	/**
@@ -21,13 +22,15 @@ namespace Victor { namespace Mobi {
 	public:
 		/**
 		 * @brief Calculates TMScore with given models
-		 * @param prot (ProteinModel&) protein object
-		 * @param model (unsigned int) model name (the one to be super-imposed)
-		 * @param native (unsigned int) native model name (the one on which we super-impose)
-		 * @newMode (Spacer*) target model aligned to reference
+		 * @param prot (ProteinModel&) protein object containing the models
+		 * @param model (unsigned int) target model (the one to be super-imposed)
+		 * @param native (unsigned int) native model (the one on which we super-impose)
+		 * @param imposedModel (Spacer*) copy of target model after TMScore super-imposition over native model
 		 * @return TMScore of the two models
 		 */
 		virtual double tms (ProteinModel& prot, unsigned int model, unsigned int native, Spacer& imposedModel){return 0;};
+
+		virtual double tms(const char* modelFile, const char* nativeFile, Spacer& imposedModel);
 		virtual ~TMScoreBinder(){};
 	};
 

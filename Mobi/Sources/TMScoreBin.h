@@ -9,10 +9,13 @@
 #define MOBI_SOURCES_TMSCOREBIN_H_
 
 #include <TMScoreBinder.h>
-#include <Spacer.h>
 
 using namespace Victor::Biopool;
 using namespace Victor::Mobi;
+
+//extern const char* TMTMP_IN1;
+//extern const char* TMTMP_IN2;
+//extern const char* TMTMP_OUT;
 
 
 namespace Victor { namespace Mobi {
@@ -27,11 +30,13 @@ namespace Victor { namespace Mobi {
 		 * @param _binary (string) full path to binary TMScore file, must have execution permission
 		 * @param _tmp (string) full path to temp dir, must have write permission
 		 */
-		TMScoreBin(std::string _binary, std::string _tmp) : binary(_binary), tmp(_tmp){};
+		TMScoreBin(std::string _binary = "TMScore", std::string _tmp = ".") : binary(_binary), tmp(_tmp){};
 
-		double tms(Spacer& model, Spacer& native, Spacer* imposedModel);
+
+		double tms(const char* modelFile, const char* nativeFile, Spacer& imposedModel);
+		double tms(ProteinModel& prot, unsigned int model, unsigned int native, Spacer& imposedModel);
 		~TMScoreBin(){
-
+			this->~TMScoreBinder();
 		};
 
 	private:
