@@ -28,7 +28,6 @@
 #include<AtomCode.h>
 
 using namespace Victor::Biopool;
-//using namespace Victor::Mobi;
 
 namespace Victor { namespace Mobi {
 	/**
@@ -41,7 +40,7 @@ namespace Victor { namespace Mobi {
 		ProteinModel(const Protein& _orig) : Protein(_orig){};
 
 
-		void load(PdbLoader& pl, char chain = '*', unsigned int model = 0);
+		void load(PdbLoader& pl, vector<unsigned int> models);
 		Spacer& getModel(unsigned int _model);
 		void SD(vector<double>& sd, ProteinModel& ref, AtomCode atom, double d0 = 4);
 		void SD(vector<double>& sd, Spacer& ref, AtomCode atom, double d0 = 4);

@@ -10,19 +10,20 @@
 
 #include <TMScoreBinder.h>
 
+
 using namespace Victor::Biopool;
 using namespace Victor::Mobi;
 
-//extern const char* TMTMP_IN1;
-//extern const char* TMTMP_IN2;
-//extern const char* TMTMP_OUT;
+extern string TMTMP_IN1;
+extern string TMTMP_IN2;
+extern string TMTMP_OUT;
 
 
 namespace Victor { namespace Mobi {
 	/**
 	 * @brief TMScore functionalities through external binary.
 	 */
-	class TMScoreBin : public TMScoreBinder{
+	class TMScoreBin{
 	public:
 
 		/**
@@ -33,11 +34,10 @@ namespace Victor { namespace Mobi {
 		TMScoreBin(std::string _binary = "TMScore", std::string _tmp = ".") : binary(_binary), tmp(_tmp){};
 
 
-		double tms(const char* modelFile, const char* nativeFile, Spacer& imposedModel);
-		double tms(ProteinModel& prot, unsigned int model, unsigned int native, Spacer& imposedModel);
-		~TMScoreBin(){
-			this->~TMScoreBinder();
-		};
+		virtual double tms(string modelFile, string& nativeFile, Spacer& imposedModel);
+		virtual double tms(ProteinModel& prot, unsigned int model, unsigned int native, Spacer& imposedModel);
+		virtual ~TMScoreBin(){};
+
 
 	private:
 		std::string binary;

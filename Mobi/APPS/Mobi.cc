@@ -18,6 +18,7 @@
  */
 /**
  */
+
 #include <Protein.h>
 #include <PdbLoader.h>
 #include <PdbSaver.h>
@@ -25,6 +26,8 @@
 #include <GetArg.h>
 #include <ProteinModel.h>
 #include <TMScoreBin.h>
+#include <Debug.h>
+#include <String2Number.h>
 
 using namespace Victor;
 using namespace Victor::Biopool;
@@ -34,23 +37,36 @@ void sShowHelp() {
     cout << "Help message goes here...\n\n";
 }
 
+vector<std::string> splitString(std::string in, char del){
+	vector<std::string> toks;
+	std::stringstream ss(in);
+	std::string tok;
+
+	while(std::getline(ss, tok, del)){
+		toks.push_back(tok);
+	}
+	return toks;
+}
+
 int main(int argc, char* argv[]) {
 
+	DEBUG_MSG("Welcome to Mobi!");
 	//If -h specified, show help message
     if (getArg("h", argc, argv)) {
         sShowHelp();
         return 1;
     }
 
-    string inputFile, outputFile, chainID;
-    unsigned int modelNum;
-    bool chi, all;
+    string inputFile, outputFile, chainID, modelList;
+    vector<unsigned int> models;
+    unsigned int modevelNum;
+
+    bool chi;
 
     getArg("i", inputFile, argc, argv, "!");
     getArg("o", outputFile, argc, argv, "!");
     getArg("c", chainID, argc, argv, "!");
-    getArg("m", modelNum, argc, argv, 999);
-    all = getArg("-all", argc, argv);
+    getArg("m", modelList, argc, argv, "!");
     chi = getArg("-chi", argc, argv);
 
     // Check input file
@@ -66,39 +82,47 @@ int main(int argc, char* argv[]) {
     vector<Atom*> model;
 
     // Set PdbLoader variables
-
     if (!getArg("v", argc, argv)) {
         pl.setNoVerbose();
     }
-    // Check chain args
-    if ((chainID != "!") && all) {
-        ERROR("You can use --all or -c, not both", error);
-    }
+
     // User selected chain
     if (chainID != "!") {
         if (chainID.size() > 1)
             ERROR("You can choose only 1 chain", error);
         pl.setChain(chainID[0]);
-    }// All chains
-    else if (all) {
-        pl.setAllChains();
+        pl.checkAndSetChain();
     }// First chain
     else {
         pl.setChain(pl.getAllChains()[0]);
+    }
+
+    // User selected models
+    if (modelList != "!"){
+    	models = sToVectorOfUIntDEF(translate(modelList,',',' '));
+    		for (unsigned int i = 0; i < models.size(); i++)
+    			if (models[i] > pl.getMaxModels())
+    				ERROR("You specified out of bound model number(s). Max for this input pdb is " + pl.getMaxModels(), exception);
+    }else{
+    	for (unsigned int i = 1; i <= pl.getMaxModels(); i++)
+    		models.push_back(i);
     }
 
 
     // Load the protein object
 
     // Open the proper output stream (file or stdout)
-    std::ofstream fout;
+    //std::ofstream fout;
 
 
-    ProteinModel prot1;
-    PdbSaver ps(cout);
-    //ps.saveProtein(prot1);
-    prot1.load(pl);
-    cout << "sizeProtein = " << prot1.sizeProtein() << endl;
+    ProteinModel prot;
+    //PdbSaver ps(cout);
+    models = vector<unsigned int>();
+    models.push_back(3);
+    models.push_back(1);
+    //models.push_back(3);
+    prot.load(pl,models);
+
 
     /*
     for (unsigned int i = 1; i < 5; i++){
@@ -112,7 +136,7 @@ int main(int argc, char* argv[]) {
 	*/
     TMScoreBin tm("TMScore",".");
     Spacer sss;
-    tm.tms(prot1, 1, 2, sss);
+    cout << "TM-score = " << tm.tms(prot, 0, 1, sss);
 
 
     //dtf

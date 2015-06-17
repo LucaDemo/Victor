@@ -31,7 +31,7 @@ namespace Victor { namespace Mobi {
 		virtual double tms (ProteinModel& prot, unsigned int model, unsigned int native, Spacer& imposedModel){return 0;};
 
 		virtual double tms(const char* modelFile, const char* nativeFile, Spacer& imposedModel);
-		virtual ~TMScoreBinder(){};
+		virtual ~TMScoreBinder(){}
 	};
 
 }}

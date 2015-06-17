@@ -17,7 +17,7 @@
 /**
  * @file ProteinModel.cc
  * @author Luca Demo
- * @date May 2015
+ * @date Jun 2015
  * @version 0.1
  */
 #include <ProteinModel.h>
@@ -33,22 +33,22 @@ using namespace Victor::Biopool;
  * @param chain (char) name of the chain to load, * = first chain (default)
  * @param model (unsigned int) model to load, 0 = all models (default)
  */
-void ProteinModel::load(PdbLoader& pl, char chain, unsigned int model){
-	if (chain != '*')
-		pl.setChain(chain);
-	else
-		pl.setChain(pl.getAllChains()[0]);
-	pl.checkAndSetChain();
-	if (model > 0){	//load a single model (the specified one)
-		pl.setModel(model);
+void ProteinModel::load(PdbLoader& pl, vector<unsigned int> models){
+	/*for(unsigned int i = 0; i < models.size(); i++){	//for debug
+		cout << models[i] << endl;
+		pl.setModel(models[i]);
 		pl.checkModel();
 		this->Protein::load(pl);
-	}else			//load all models
-		for (unsigned int i = 0; i < pl.getMaxModels(); i++){
-			pl.setModel(i);
-			pl.checkModel();
-			this->Protein::load(pl);
-		}
+		cout << this->sizeProtein() << endl;
+		cout << this->getSpacer((unsigned int) 0)->getType() << endl;
+	}*/
+
+	for(unsigned int i = 0; i < models.size(); i++){
+		pl.setModel(models[i]);
+		pl.checkModel();
+		this->Protein::load(pl);
+	}
+
 }
 
 /**

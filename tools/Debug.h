@@ -151,7 +151,8 @@ private:
 #define PRECOND(a, b) 
 #define POSTCOND(a, b) 
 #define INVARIANT(a, b) 
-#define DEBUG_MSG(a)
+#define DEBUG_MSG(aString) V1OUT << "DEBUG_MSG(off):  " << (aString) << endl
+//#define DEBUG_MSG(a)
 #define DEBUG_BREAK(a, b)
 #define DEBUG_TRACE 
 #define DUMP(a)
