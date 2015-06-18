@@ -178,6 +178,7 @@ subclean:
 	$(RM) -fr ./Lobo/data
 	$(RM) -fr ./Biopool/data
 	$(RM) -fr ./Mobi/data
+	$(RM) -fr ./Mobi/data/*
 
 	
   
