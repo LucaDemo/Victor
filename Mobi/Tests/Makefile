@@ -16,17 +16,17 @@ BINPATH = ../../bin
 # Libraries and paths (which are not defined globally).
 #
 
-LIBS = -lBiopool -ltools -L/usr/lib/ -lMobi -lm -ldl -lcppunit
+LIBS = -lMobi -lBiopool -ltools -L/usr/lib/  -lm -ldl -lcppunit
 
 LIB_PATH = -L.
 
-INC_PATH = -I.
+INC_PATH = -I. -I../../tools/ -I../../Biopool/Sources -I../../Mobi/Sources
 
 #
 # Objects and headers
 #
 
-SOURCES =  TestMobi.cc
+SOURCES =  TestMobi.cc TestResults.h
 
 OBJECTS =  $(SOURCES:.cpp=.o)
 

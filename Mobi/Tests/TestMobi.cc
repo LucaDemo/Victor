@@ -9,7 +9,7 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/ui/text/TestRunner.h>
 
-#include <TestSDResults.h>
+#include "TestResults.h"
 using namespace std;
 
 
@@ -17,7 +17,7 @@ int main() {
 	CppUnit::TextUi::TestRunner runner;
 
 	cout << "Creating Test Suites:" << endl;
-	runner.addTest(TestSDResults::suite());
+	runner.addTest(TestResults::suite());
 	cout<< "Running the unit tests."<<endl;
 	runner.run();
 

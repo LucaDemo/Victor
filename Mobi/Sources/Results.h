@@ -1,6 +1,6 @@
 
-#ifndef MOBI_SOURCES_SDRESULTS_H_
-#define MOBI_SOURCES_SDRESULTS_H_
+#ifndef MOBI_SOURCES_RESULTS_H_
+#define MOBI_SOURCES_RESULTS_H_
 
 #include <Spacer.h>
 #include <AtomCode.h>
@@ -22,10 +22,10 @@ void scaledDistance(vector<double>& sd, Spacer& mod, Spacer& ref, AtomCode atom 
 /**
  * @brief Class used to manage collections of Mobility results
  */
-class SDResults{
+class Results{
 
 public:
-	SDResults(){
+	Results(){
 		this->results = new std::map<int,std::vector<double> >();
 	}
 
@@ -66,4 +66,4 @@ private:
 
 }}	//namespaces
 
-#endif /* MOBI_SOURCES_SDRESULTS_H_ */
+#endif /* MOBI_SOURCES_RESULTS_H_ */

@@ -5,8 +5,8 @@
  *      Author: luca
  */
 
-#ifndef MOBI_TESTS_TESTSDRESULTS_H_
-#define MOBI_TESTS_TESTSDRESULTS_H_
+#ifndef MOBI_TESTS_TESTRESULTS_H_
+#define MOBI_TESTS_TESTRESULTS_H_
 
 
 #include <iostream>
@@ -18,30 +18,30 @@
 
 #include <Spacer.h>
 #include <PdbLoader.h>
-#include <SDResults.h>
+#include <Results.h>
 
 using namespace std;
 using namespace Victor::Mobi;
 
-class TestSDResults : public CppUnit::TestFixture {
+class TestResults : public CppUnit::TestFixture {
 
 public:
 
-	TestSDResults(){}
+	TestResults(){}
 
-	~TestSDResults(){}
+	virtual ~TestResults(){}
 
 	static CppUnit::Test *suite() {
-	        CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("TestSDResults");
+	        CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("TestResults");
 
-	        suiteOfTests->addTest(new CppUnit::TestCaller<TestSDResults>("Test1 - Populate the results map",
-	                &TestSDResults::testSDPopulation));
+	        suiteOfTests->addTest(new CppUnit::TestCaller<TestResults>("Test1 - Populate the results map",
+	                &TestResults::testSDPopulation));
 
-	        suiteOfTests->addTest(new CppUnit::TestCaller<TestSDResults>("Test2 - Calculate scaled distance mean",
-	                &TestSDResults::testSDMean));
+	        suiteOfTests->addTest(new CppUnit::TestCaller<TestResults>("Test2 - Calculate scaled distance mean",
+	                &TestResults::testSDMean));
 
-	        suiteOfTests->addTest(new CppUnit::TestCaller<TestSDResults>("Test3 - Calculate scaled distance standard deviation",
-	                &TestSDResults::testSDSD));
+	        suiteOfTests->addTest(new CppUnit::TestCaller<TestResults>("Test3 - Calculate scaled distance standard deviation",
+	                &TestResults::testSDSD));
 
 	        return suiteOfTests;
 	    }
@@ -53,14 +53,14 @@ public:
 protected:
 
 	void testSDPopulation(){
-		SDResults sdr = SDResults();
+		Results sdr = Results();
 		fillWith3Results10(sdr);
 		CPPUNIT_ASSERT(sdr.size() == 3);
 		CPPUNIT_ASSERT(sdr.modelsSize() == 10);
 	}
 
 	void testSDMean(){
-		SDResults sdr = SDResults();
+		Results sdr = Results();
 		fillWith3Results10(sdr);
 		vector<double> *mean = new vector<double>(10);
 		sdr.meanSD(mean);
@@ -74,7 +74,7 @@ protected:
 
 private:
 
-	void fillWith3Results10(SDResults& sdr){
+	void fillWith3Results10(Results& sdr){
 		unsigned int modelLen = 10;
 		vector<double> *v1 = new vector<double>(modelLen);
 		vector<double> *v2 = new vector<double>(modelLen);
@@ -92,4 +92,4 @@ private:
 
 
 
-#endif /* MOBI_TESTS_TESTSDRESULTS_H_ */
+#endif /* MOBI_TESTS_TESTRESULTS_H_ */

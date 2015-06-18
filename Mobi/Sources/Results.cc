@@ -5,14 +5,16 @@
  *      Author: luca
  */
 
+#include <Results.h>
+#include <Atom.h>
+#include <Spacer.h>
+#include <PdbLoader.h>
 
-#include <SDResults.h>
-using namespace Victor;
 using namespace Victor::Biopool;
 using namespace Victor::Mobi;
 
 double const DEF_D0 = 4;
-AtomCode const DEF_ATOM = CA;
+//AtomCode const DEF_ATOM = CA;
 
 /**
  * Get Scale Distance between two models
@@ -22,7 +24,7 @@ AtomCode const DEF_ATOM = CA;
  * @param atoms (vector<string>&) names of the atoms to consider, default value is used if not specified
  * @param d0 (double) normalization parameter, default value is used if not specified
  */
-void Victor::Mobi::scaledDistance(vector<double>& sd, Spacer& mod, Spacer& ref, AtomCode atom, double d0){
+void scaledDistance(vector<double>& sd, Spacer& mod, Spacer& ref, AtomCode atom, double d0){
 	sd.clear();
 	if (ref.size() != mod.size())
 		ERROR("Reference protein spacer has a different number of Amino",exception);
@@ -46,7 +48,7 @@ void Victor::Mobi::scaledDistance(vector<double>& sd, Spacer& mod, Spacer& ref, 
  * the distance between pair of aligned models.
  * @param mean (vector<double> *) pointer to output vector
  */
-void SDResults::meanSD(vector<double> *mean){
+void Results::meanSD(vector<double> *mean){
 	mean = new vector<double>(this->modelsSize());
 	std::map<int,std::vector<double> >::const_iterator it;
 	for (it = this->results->begin(); it != this->results->end(); ++it)
