@@ -34,7 +34,7 @@ namespace Victor { namespace Mobi {
 		TMScoreBin(std::string _binary = "TMScore", std::string _tmp = ".") : binary(_binary), tmp(_tmp){};
 
 
-		virtual double tms(string modelFile, string& nativeFile, Spacer& imposedModel);
+		virtual double tms(string modelFile, string nativeFile, Spacer& imposedModel);
 		virtual double tms(ProteinModel& prot, unsigned int model, unsigned int native, Spacer& imposedModel);
 		virtual ~TMScoreBin(){};
 

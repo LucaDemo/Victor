@@ -20,7 +20,7 @@ int main() {
 	CppUnit::TextUi::TestRunner runner;
 
 	cout << "Creating Test Suites:" << endl;
-        runner.addTest(TestAtom::suite());
+        //runner.addTest(TestAtom::suite());
         runner.addTest(TestGroup::suite());
         runner.addTest(TestAminoAcid::suite());
         runner.addTest(TestSpacer::suite());

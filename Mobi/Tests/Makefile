@@ -7,7 +7,7 @@
 # Path to project directory.
 UPDIR = ../..
 # Path to subdirectories.
-SUBDIR = ../../tools
+SUBDIR=
 # Path to directory for binaries:
 BINPATH = ../../bin
 
@@ -16,47 +16,42 @@ BINPATH = ../../bin
 # Libraries and paths (which are not defined globally).
 #
 
-LIBS = -lBiopool -ltools
+LIBS = -lBiopool -ltools -L/usr/lib/ -lMobi -lm -ldl -lcppunit
 
 LIB_PATH = -L.
 
-INC_PATH = -I. -I../../tools -I../../Biopool/Sources
+INC_PATH = -I.
 
 #
 # Objects and headers
 #
- 
 
-SOURCES = 	 ProteinModel.cc TMScoreBin.cc SDResults.cc
+SOURCES =  TestMobi.cc
+
+OBJECTS =  $(SOURCES:.cpp=.o)
+
+TARGETS = TestMobi
+
+EXECS = TestMobi
+
+LIBRARY = TESTlibMobi.a
 
 
-OBJECTS = 	 ProteinModel.o  TMScoreBin.o SDResults.o
-
-
-TARGETS =   
-
-EXECS =   
-
-LIBRARY = libMobi.a
 
 #
 # Install rule
 #
 
-#start: subdirs
-
 compile: all
-
-allinstall: $(LIBRARY) $(TARGETS) 
-	    mv $(LIBRARY) $(UPDIR)/lib/
-	 
-
-install: subinstall allinstall
-
+	
 all: install
+
+install: $(LIBRARY) $(TARGETS)
+	mv $(EXECS) $(UPDIR)/bin
+	mv $(LIBRARY) $(UPDIR)/lib
+	
 #
 # Call global Makefile to do the job.
 #
 
 include ../../Makefile.global
-
