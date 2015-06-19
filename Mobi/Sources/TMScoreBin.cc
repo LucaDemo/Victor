@@ -38,7 +38,7 @@ string TMTMP_IN1 = "tmin1.pdb.tmp";
 string TMTMP_IN2 = "tmin2.pdb.tmp";
 string TMTMP_OUT = "tmout.pdb.tmp";
 
-double TMScoreBin::tms(ProteinModel& prot, unsigned int model, unsigned int native, Spacer& imposedModel){
+double TMScoreBin::tms(ProteinModel& prot, unsigned int model, unsigned int native, Spacer** imposedModel){
 
 	std::stringstream sstm;
 	sstm << "TMScore between models " << model << " and " << native;
@@ -47,20 +47,20 @@ double TMScoreBin::tms(ProteinModel& prot, unsigned int model, unsigned int nati
 	//Save spacers in pdb files
 	std::ofstream fout;
 	PdbSaver ps(fout);
-	fout.open(TMTMP_IN1.c_str());
+	fout.open((tmp + TMTMP_IN1).c_str());
 	ps.saveSpacer(prot.getModel(model));
 	ps.endFile();
 	fout.close();
-	fout.open(TMTMP_IN2.c_str());
+	fout.open((tmp + TMTMP_IN2).c_str());
 	ps.saveSpacer(prot.getModel(native));
 	ps.endFile();
 	fout.close();
 
 	//Call TMScore binary
-	return tms(TMTMP_IN1, TMTMP_IN2, imposedModel);
+	return tms((tmp + TMTMP_IN1), (tmp + TMTMP_IN2), imposedModel);
 }
 
-double TMScoreBin::tms(string modelFile, string nativeFile, Spacer& imposedModel){
+double TMScoreBin::tms(string modelFile, string nativeFile, Spacer** imposedModel){
 	if (access(modelFile.c_str(), R_OK) == 0 && access(nativeFile.c_str(), R_OK) == 0){
 		if(access(binary.c_str(), X_OK) == 0){
 			pid_t pid;
@@ -77,9 +77,10 @@ double TMScoreBin::tms(string modelFile, string nativeFile, Spacer& imposedModel
 					dup2(pipefd[1],1);	//stdout
 					dup2(pipefd[1],2);	//stderr
 					close(pipefd[1]);
-					if (execl(binary.c_str(),binary.c_str(), modelFile.c_str(),nativeFile.c_str(), NULL))
+					if (execl(binary.c_str(),binary.c_str(), modelFile.c_str(),nativeFile.c_str(), "-o" , (tmp + TMTMP_OUT).c_str(),NULL))
 						ERROR("Unable to exec",error);
 				} else{
+					//Read output from child pipe
 					char buffer[2048];
 					if (read(pipefd[0],buffer, sizeof(buffer)) > 0){
 						char * tok;
@@ -91,7 +92,7 @@ double TMScoreBin::tms(string modelFile, string nativeFile, Spacer& imposedModel
 							tok = strtok(NULL,"\n\r");
 						}
 					}
-					ERROR("TM-score failed or non reconized output", exception)
+					ERROR("TM-score failed or non recognised output", exception)
 				}
 			}
 		}
@@ -100,6 +101,8 @@ double TMScoreBin::tms(string modelFile, string nativeFile, Spacer& imposedModel
 	}
 	else
 		ERROR("No access to pdb files " + modelFile + " or " + nativeFile, exception);
+
+
 
 	return 0;
 }

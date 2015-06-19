@@ -43,6 +43,7 @@ Mobi/Sources/*.o
 Mobi/Sources/*.a
 Mobi/Tests/*.a
 Mobi/Tests/*.o
+Mobi/Tests/data/*.tmp*
 tools/*.o
 tools/*.a
 tools/Depend

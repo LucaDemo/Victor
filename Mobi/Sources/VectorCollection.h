@@ -114,7 +114,7 @@ public:
 				sd[a] += pow(it->second[a] - mean[a],2);
 		for (unsigned int a = 0; a < this->vectorsSize(); a++)
 			sd[a] = sqrt(sd[a] / this->size());
-		return sd;
+		return mean;
 	}
 
 protected:

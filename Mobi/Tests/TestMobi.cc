@@ -9,7 +9,9 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/ui/text/TestRunner.h>
 
-#include "TestVectorCollection.h"
+#include <TestProteinModel.h>
+#include <TestVectorCollection.h>
+#include <TestTM.h>
 using namespace std;
 
 
@@ -18,6 +20,8 @@ int main() {
 
 	cout << "Creating Test Suites:" << endl;
 	runner.addTest(TestVectorCollection::suite());
+	runner.addTest(TestProteinModel::suite());
+	runner.addTest(TestTM::suite());
 	cout<< "Running the unit tests."<<endl;
 	runner.run();
 

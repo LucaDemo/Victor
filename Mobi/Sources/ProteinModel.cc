@@ -28,27 +28,36 @@ using namespace Victor::Mobi;
 using namespace Victor::Biopool;
 
 /**
- * Load Pdb data into Protein object with the specified model
+ * Load Pdb data into Protein object. The specified models are loaded.
+ * There is no direct correlation between models id in pdb file and model
+ * index inside protein object. Index inside protein depends on the order
+ * in which the models are loaded. *
  * @param pl (PdbLoader&) reference to the PdbLoader to load from
- * @param chain (char) name of the chain to load, * = first chain (default)
- * @param model (unsigned int) model to load, 0 = all models (default)
+ * @param chain (char) name of the chain to load, 0 = first chain (default)
+ * @param model (vector<unsigned int>) models to load (accordind to pdb file model names),
  */
-void ProteinModel::load(PdbLoader& pl, vector<unsigned int> models){
-	/*for(unsigned int i = 0; i < models.size(); i++){	//for debug
-		cout << models[i] << endl;
-		pl.setModel(models[i]);
-		pl.checkModel();
-		this->Protein::load(pl);
-		cout << this->sizeProtein() << endl;
-		cout << this->getSpacer((unsigned int) 0)->getType() << endl;
-	}*/
+void ProteinModel::load(PdbLoader& pl, char chain, vector<unsigned int> models){
+	cout << "Loading protein models..." <<endl;
+	if (chain == 0)
+		pl.setAllChains();
+	else
+		pl.setChain(pl.getAllChains()[0]);
 
 	for(unsigned int i = 0; i < models.size(); i++){
+		cout << "\t>>>model#" << models[i] << endl;
 		pl.setModel(models[i]);
 		pl.checkModel();
 		this->Protein::load(pl);
 	}
+}
 
+void ProteinModel::load(PdbLoader& pl){
+	for(unsigned int i = 1; i+1 < pl.getMaxModels(); i++){
+		cout << "\t>>>model#" << i << endl;
+		pl.setModel(i);
+		pl.checkModel();
+		this->Protein::load(pl);
+	}
 }
 
 /**

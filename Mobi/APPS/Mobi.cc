@@ -120,8 +120,14 @@ int main(int argc, char* argv[]) {
     models = vector<unsigned int>();
     models.push_back(3);
     models.push_back(1);
+    models.push_back(4);
+    models.push_back(6);
+    models.push_back(5);
+    models.push_back(8);
+    models.push_back(7);
+	models.push_back(2);
     //models.push_back(3);
-    prot.load(pl,models);
+    prot.load(pl,0,models);
 
 
     /*
@@ -136,7 +142,7 @@ int main(int argc, char* argv[]) {
 	*/
     TMScoreBin tm("TMScore",".");
     Spacer sss;
-    cout << "TM-score = " << tm.tms(prot, 0, 1, sss);
+    //cout << "TM-score = " << tm.tms(prot, 0, 1, sss);
 
 
     //dtf
