@@ -5,10 +5,6 @@
  *      Author: luca
  */
 
-#ifndef MOBI_TESTS_TESTVECTORCOLLECTION_H_
-#define MOBI_TESTS_TESTVECTORCOLLECTION_H_
-
-
 #include <iostream>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestAssert.h>
@@ -69,18 +65,13 @@ protected:
 	}
 
 	void testMeanSD(){
-		cout << endl << ">>>\tTestVectorCollection >>> test Mean & SD calculation\nPopulating collection..." << endl;
+		cout << endl << ">>>\tTestVectorCollection >>> test Mean\nPopulating collection..." << endl;
 		VectorCollection sdr = VectorCollection();
 		fillWith3Results10(sdr);
 		vector<double> mean = sdr.mean();
 		for (unsigned int i = 0; i < 10; i++)
 			CPPUNIT_ASSERT(mean[i] == i+1);
 		cout << "Mean calculation correct!" << endl;
-
-		vector<double> sd = sdr.stdDev();
-		for (unsigned int i = 0; i < 10; i++)
-			CPPUNIT_ASSERT(sd[i] > 0.816496 && sd[i] < 0.816498);
-		cout << "Standard deviation calculation correct!" << endl;
 	}
 
 	void testSD(){
@@ -88,8 +79,10 @@ protected:
 		VectorCollection sdr = VectorCollection();
 		fillWith3Results10(sdr);
 		vector<double> sd = sdr.stdDev();
-		for (unsigned int i = 0; i < 10; i++)
+		for (unsigned int i = 0; i < 10; i++){
+			cout << sd[i] << endl;
 			CPPUNIT_ASSERT(sd[i] > 0.816496 && sd[i] < 0.816498);
+		}
 
 	}
 
@@ -111,6 +104,3 @@ private:
 	}
 };
 
-
-
-#endif /* MOBI_TESTS_TESTVECTORCOLLECTION_H_ */

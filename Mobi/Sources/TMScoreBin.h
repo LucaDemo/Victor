@@ -40,6 +40,7 @@ namespace Victor { namespace Mobi {
 
 		virtual double tms(string modelFile, string nativeFile, Spacer** imposedModel);
 		virtual double tms(ProteinModel& prot, unsigned int model, unsigned int native, Spacer** imposedModel);
+		static void spacerFromTMOutput(string pdbFile, Spacer** spacer);
 		virtual ~TMScoreBin(){};
 
 

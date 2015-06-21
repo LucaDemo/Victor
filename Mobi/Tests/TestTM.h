@@ -14,6 +14,7 @@
 
 #include <Spacer.h>
 #include <PdbLoader.h>
+#include <PdbSaver.h>
 #include <TMScoreBin.h>
 
 using namespace std;
@@ -50,44 +51,38 @@ protected:
 		ifstream inFile(inputFile.c_str());
 		if (!inFile)
 			ERROR("Input file not found.", exception);
-
-		PdbLoader pl(inFile);
-		pl.setNoVerbose();
-	    ProteinModel prot;
-	    vector<unsigned int> models = vector<unsigned int>();
+		//models to load
+		vector<unsigned int> models = vector<unsigned int>();
 	    models.push_back(1);
 	    models.push_back(2);
+
+	    //loading models
+		PdbLoader pl(inFile);
+		pl.setNoVerbose();
+		ProteinModel prot;
 	    cout << "Loading models 1 and 2" << endl;
 	    prot.load(pl,0,models);
+
+	    //calling TMScore bin
 	    cout << "TM Score binary call" << endl;
 	    TMScoreBin tmsb = TMScoreBin(TMDir+"TMScore", TMDir);
-	    Spacer* sp;
-//	    double score = tmsb.tms(prot,0,1,&sp);
-//	    cout << "Score is " << score << endl;
-//	    CPPUNIT_ASSERT(score > 0 && score < 1);
+	    Spacer* superImposed;
+	    cout << "&superimposed=" << &superImposed << endl;
+	    cout << "&(*superimposed)=" << superImposed << endl;
+	    double score = tmsb.tms(prot,0,1,&superImposed);
+	    cout << "Score is " << score << endl;
+	    CPPUNIT_ASSERT(score > 0 && score < 1);
 
-	    ifstream outFile((TMDir + TMTMP_OUT + "_atm").c_str());
-	    //while (outFile)
-		//	cout << readLine(outFile);
-
-
-	    PdbLoader pl2(outFile);
-	    cout << pl2.getMaxModels() << " models" << endl;
-	    pl2.setModel(2);
-	    pl2.checkModel();
-	    ProteinModel prot2;
-	    models.clear();
-	    models.push_back(2);
-	    prot2.load(pl2);
-
-//	    CPPUNIT_ASSERT(prot.size() == 3);
-//	    Spacer m1 = prot.getModel(0);
-//	    Spacer m2 = prot.getModel(1);
-//	    Spacer m3 = prot.getModel(2);
-//	    CPPUNIT_ASSERT(m1.getAmino(0).getType() == "GLY");
-//	    CPPUNIT_ASSERT(m2.getAmino(1).getType() == "SER");
-//	    CPPUNIT_ASSERT(m3.getAmino(2).getType() == "GLY");
-//	    cout << "All fine!" << endl;
+	    //save superimposed model to file
+	    std::ofstream fout;
+		PdbSaver ps(fout);
+		fout.open((TMDir + "si_out.pdb").c_str());
+		cout << "&superimposed=" << &superImposed << endl;
+		cout << "&(*superimposed)=" << superImposed << endl;
+		cout << (*superImposed).sizeAmino() << endl;
+		ps.saveSpacer(*superImposed);
+		//ps.endFile();
+		fout.close();
 	}
 };
 

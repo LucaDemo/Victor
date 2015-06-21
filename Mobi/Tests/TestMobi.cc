@@ -22,8 +22,8 @@ int main() {
 	runner.addTest(TestVectorCollection::suite());
 	runner.addTest(TestProteinModel::suite());
 	runner.addTest(TestTM::suite());
-	cout<< "Running the unit tests."<<endl;
-	runner.run();
+	cout<< "Running the unit tests. " << endl;
 
+	runner.run();
 	return 0;
 }

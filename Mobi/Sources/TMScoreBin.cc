@@ -29,6 +29,7 @@
 #include <Debug.h>
 #include <stdio.h>
 #include <string>
+#include <iostream>
 
 using namespace Victor::Mobi;
 using namespace Victor::Biopool;
@@ -61,6 +62,7 @@ double TMScoreBin::tms(ProteinModel& prot, unsigned int model, unsigned int nati
 }
 
 double TMScoreBin::tms(string modelFile, string nativeFile, Spacer** imposedModel){
+	double score = -1;
 	if (access(modelFile.c_str(), R_OK) == 0 && access(nativeFile.c_str(), R_OK) == 0){
 		if(access(binary.c_str(), X_OK) == 0){
 			pid_t pid;
@@ -88,11 +90,12 @@ double TMScoreBin::tms(string modelFile, string nativeFile, Spacer** imposedMode
 						while (tok != NULL){
 							if (string(tok).find("TM-score") == 0)
 								if (string(tok).find("=") > 0)
-									return std::strtod(string(tok).substr(string(tok).find("=")+2,6).c_str(),NULL);
+									score = std::strtod(string(tok).substr(string(tok).find("=")+2,6).c_str(),NULL);
 							tok = strtok(NULL,"\n\r");
 						}
 					}
-					ERROR("TM-score failed or non recognised output", exception)
+					if (score < 0)
+						ERROR("TM-score failed or non recognised output", exception)
 				}
 			}
 		}
@@ -102,9 +105,45 @@ double TMScoreBin::tms(string modelFile, string nativeFile, Spacer** imposedMode
 	else
 		ERROR("No access to pdb files " + modelFile + " or " + nativeFile, exception);
 
-
-
-	return 0;
+	TMScoreBin::spacerFromTMOutput(tmp + TMTMP_OUT + "_atm", imposedModel);
+	cout << "SizeAmino di &(**spacer) in tms=" << (**imposedModel).size() << endl;
+	return score;
 }
 
+
+void TMScoreBin::spacerFromTMOutput(string pdbFile, Spacer** spacer){
+	if (access(pdbFile.c_str(), R_OK) != 0)
+		ERROR("Cannot read pdb file to fix",exception);
+	cout << "spacerFromTM" << endl;
+	ifstream inFile(pdbFile.c_str());
+	stringstream buffer;
+	string line;
+	while (inFile){
+		line = readLine(inFile);
+		if (line.substr(0,16) == "REMARK  TM-score"){
+			buffer << line << endl;
+			if (line.substr(6,8) == "TM-score")
+				buffer << "MODEL        1" << endl;
+		}else if (line.substr(0,6) == "ATOM  "){
+			buffer << line << endl;
+		}else if (line.substr(0,3) == "TER"){
+			buffer << line << endl;
+			buffer << "ENDMDL" << endl;
+			break;
+		}
+	}
+	buffer.clear();
+	buffer.seekg(0);
+
+	PdbLoader pl(buffer);
+	ProteinModel pm;
+	pl.setModel(1);
+	pl.loadProtein(pm);
+	cout << "&(*spacer)=" << spacer << endl;
+	cout << "&(**spacer)=" << (*spacer) << endl << "Assegnazione..." << endl;
+	*spacer = new Spacer(pm.getModel(0));
+	cout << "&(*spacer)=" << spacer << endl;
+	cout << "&(**spacer)=" << (*spacer) << endl;
+	cout << "SizeAmino di &(**spacer) in spacerFrom...=" << (**spacer).size() << endl;
+}
 

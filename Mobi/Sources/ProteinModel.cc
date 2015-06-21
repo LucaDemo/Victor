@@ -52,7 +52,8 @@ void ProteinModel::load(PdbLoader& pl, char chain, vector<unsigned int> models){
 }
 
 void ProteinModel::load(PdbLoader& pl){
-	for(unsigned int i = 1; i+1 < pl.getMaxModels(); i++){
+	cout << "LOAD" << endl;
+	for(unsigned int i = 1; i <= pl.getMaxModels(); i++){
 		cout << "\t>>>model#" << i << endl;
 		pl.setModel(i);
 		pl.checkModel();
