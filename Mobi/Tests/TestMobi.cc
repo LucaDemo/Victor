@@ -18,11 +18,11 @@ using namespace std;
 int main() {
 	CppUnit::TextUi::TestRunner runner;
 
-	cout << "Creating Test Suites:" << endl;
+	cout << "Creating Test Suites: " << endl;
 	runner.addTest(TestVectorCollection::suite());
 	runner.addTest(TestProteinModel::suite());
 	runner.addTest(TestTM::suite());
-	cout<< "Running the unit tests. " << endl;
+	cout<< "Running the unit tests." << endl;
 
 	runner.run();
 	return 0;

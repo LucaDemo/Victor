@@ -80,7 +80,6 @@ protected:
 		fillWith3Results10(sdr);
 		vector<double> sd = sdr.stdDev();
 		for (unsigned int i = 0; i < 10; i++){
-			cout << sd[i] << endl;
 			CPPUNIT_ASSERT(sd[i] > 0.816496 && sd[i] < 0.816498);
 		}
 

@@ -31,15 +31,16 @@
 #include <string>
 #include <iostream>
 
+
 using namespace Victor::Mobi;
 using namespace Victor::Biopool;
 using namespace std;
 
-string TMTMP_IN1 = "tmin1.pdb.tmp";
-string TMTMP_IN2 = "tmin2.pdb.tmp";
-string TMTMP_OUT = "tmout.pdb.tmp";
+const string TMTMP_IN1 = "tmin1.pdb.tmp";
+const string TMTMP_IN2 = "tmin2.pdb.tmp";
+const string TMTMP_OUT = "tmout.pdb.tmp";
 
-double TMScoreBin::tms(ProteinModel& prot, unsigned int model, unsigned int native, Spacer** imposedModel){
+void TMScoreBin::TMImpose(ProteinModel& prot, unsigned int model, unsigned int native, ProteinModel** imposedModel){
 
 	std::stringstream sstm;
 	sstm << "TMScore between models " << model << " and " << native;
@@ -58,10 +59,10 @@ double TMScoreBin::tms(ProteinModel& prot, unsigned int model, unsigned int nati
 	fout.close();
 
 	//Call TMScore binary
-	return tms((tmp + TMTMP_IN1), (tmp + TMTMP_IN2), imposedModel);
+	return TMImpose((tmp + TMTMP_IN1), (tmp + TMTMP_IN2), imposedModel);
 }
 
-double TMScoreBin::tms(string modelFile, string nativeFile, Spacer** imposedModel){
+void TMScoreBin::TMImpose(string modelFile, string nativeFile, ProteinModel** imposedModel){
 	double score = -1;
 	if (access(modelFile.c_str(), R_OK) == 0 && access(nativeFile.c_str(), R_OK) == 0){
 		if(access(binary.c_str(), X_OK) == 0){
@@ -100,21 +101,18 @@ double TMScoreBin::tms(string modelFile, string nativeFile, Spacer** imposedMode
 			}
 		}
 		else
-			ERROR("No access to " + binary + " binary!",exception);
+			ERROR("No access to " + binary + "  binary!",exception);
 	}
 	else
 		ERROR("No access to pdb files " + modelFile + " or " + nativeFile, exception);
 
-	TMScoreBin::spacerFromTMOutput(tmp + TMTMP_OUT + "_atm", imposedModel);
-	cout << "SizeAmino di &(**spacer) in tms=" << (**imposedModel).size() << endl;
-	return score;
+	return spacerFromTMOutput(tmp + TMTMP_OUT + "_atm", imposedModel);
 }
 
-
-void TMScoreBin::spacerFromTMOutput(string pdbFile, Spacer** spacer){
+void TMScoreBin::spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel){
 	if (access(pdbFile.c_str(), R_OK) != 0)
 		ERROR("Cannot read pdb file to fix",exception);
-	cout << "spacerFromTM" << endl;
+
 	ifstream inFile(pdbFile.c_str());
 	stringstream buffer;
 	string line;
@@ -134,16 +132,13 @@ void TMScoreBin::spacerFromTMOutput(string pdbFile, Spacer** spacer){
 	}
 	buffer.clear();
 	buffer.seekg(0);
-
+	//Load from memory buffer
 	PdbLoader pl(buffer);
-	ProteinModel pm;
+	if (!verbose)
+		pl.setNoVerbose();
+	//Load and return protein object
+	*imposedModel = new ProteinModel();
 	pl.setModel(1);
-	pl.loadProtein(pm);
-	cout << "&(*spacer)=" << spacer << endl;
-	cout << "&(**spacer)=" << (*spacer) << endl << "Assegnazione..." << endl;
-	*spacer = new Spacer(pm.getModel(0));
-	cout << "&(*spacer)=" << spacer << endl;
-	cout << "&(**spacer)=" << (*spacer) << endl;
-	cout << "SizeAmino di &(**spacer) in spacerFrom...=" << (**spacer).size() << endl;
+	pl.loadProtein(**imposedModel);
 }
 

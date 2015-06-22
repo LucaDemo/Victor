@@ -65,24 +65,21 @@ protected:
 
 	    //calling TMScore bin
 	    cout << "TM Score binary call" << endl;
-	    TMScoreBin tmsb = TMScoreBin(TMDir+"TMScore", TMDir);
-	    Spacer* superImposed;
-	    cout << "&superimposed=" << &superImposed << endl;
-	    cout << "&(*superimposed)=" << superImposed << endl;
-	    double score = tmsb.tms(prot,0,1,&superImposed);
-	    cout << "Score is " << score << endl;
-	    CPPUNIT_ASSERT(score > 0 && score < 1);
+	    TMScoreBin tmsb(TMDir+"TMScore", TMDir, false);
+	    ProteinModel* superImposed;
+	    tmsb.TMImpose(prot,0,1,&superImposed);
 
 	    //save superimposed model to file
 	    std::ofstream fout;
 		PdbSaver ps(fout);
-		fout.open((TMDir + "si_out.pdb").c_str());
-		cout << "&superimposed=" << &superImposed << endl;
-		cout << "&(*superimposed)=" << superImposed << endl;
-		cout << (*superImposed).sizeAmino() << endl;
-		ps.saveSpacer(*superImposed);
-		//ps.endFile();
+		fout.open((TMDir + "superimposed_TM-Test.pdb").c_str());
+		ps.saveSpacer(superImposed->getModel(0));
+		ps.endFile();
 		fout.close();
+
+		CPPUNIT_ASSERT(superImposed->getModel(0).sizeAmino() == 109);
+		CPPUNIT_ASSERT(superImposed->getModel(0).getAmino(0).getType() == "GLY");
+		cout << "TM Test OK!" << endl;
 	}
 };
 

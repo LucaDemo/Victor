@@ -36,16 +36,22 @@ namespace Victor { namespace Mobi {
 	 */
 	class ProteinModel : public Protein{
 	public:
-		ProteinModel() : Protein(){};
-		ProteinModel(const Protein& _orig) : Protein(_orig){};
+		ProteinModel() : Protein(), verbose(false){};
+		ProteinModel(const Protein& _orig) : Protein(_orig), verbose(false){};
 
 
 		void load(PdbLoader& pl, char chain, vector<unsigned int> models);
 		void load(PdbLoader& pl);
+
 		Spacer& getModel(unsigned int _model);
 		void SD(vector<double>& sd, ProteinModel& ref, AtomCode atom, double d0 = 4);
 		void SD(vector<double>& sd, Spacer& ref, AtomCode atom, double d0 = 4);
 
+		void setVerbose(bool v){
+			verbose = v;
+		}
+	private:
+		bool verbose;
 	};
 }}
 

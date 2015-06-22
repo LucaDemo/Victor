@@ -37,24 +37,34 @@ using namespace Victor::Biopool;
  * @param model (vector<unsigned int>) models to load (accordind to pdb file model names),
  */
 void ProteinModel::load(PdbLoader& pl, char chain, vector<unsigned int> models){
-	cout << "Loading protein models..." <<endl;
+	if (verbose)
+		cout << "Loading protein models..." <<endl;
+	//ChainSelection
 	if (chain == 0)
 		pl.setAllChains();
 	else
 		pl.setChain(pl.getAllChains()[0]);
 
+	if (!verbose)
+		pl.setNoVerbose();
+	//Load models
 	for(unsigned int i = 0; i < models.size(); i++){
-		cout << "\t>>>model#" << models[i] << endl;
+		if (verbose)
+			cout << "\t>>>model#" << models[i] << endl;
 		pl.setModel(models[i]);
 		pl.checkModel();
+
 		this->Protein::load(pl);
 	}
 }
 
 void ProteinModel::load(PdbLoader& pl){
-	cout << "LOAD" << endl;
+	if (!verbose)
+		pl.setNoVerbose();
+	//Load Models
 	for(unsigned int i = 1; i <= pl.getMaxModels(); i++){
-		cout << "\t>>>model#" << i << endl;
+		if (verbose)
+			cout << "\t>>>model#" << i << endl;
 		pl.setModel(i);
 		pl.checkModel();
 		this->Protein::load(pl);
