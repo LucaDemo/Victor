@@ -49,8 +49,10 @@ void ProteinModel::load(PdbLoader& pl, char chain, vector<unsigned int> models){
 		pl.setNoVerbose();
 	//Load models
 	for(unsigned int i = 0; i < models.size(); i++){
-		if (verbose)
+		if (verbose){
 			cout << "\t>>>model#" << models[i] << endl;
+			cout.flush();
+		}
 		pl.setModel(models[i]);
 		pl.checkModel();
 

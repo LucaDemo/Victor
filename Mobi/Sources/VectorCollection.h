@@ -34,6 +34,14 @@ public:
 	}
 
 	/**
+	 * Destructor
+	 */
+	~VectorCollection(){
+		results->clear();
+		delete results;
+	}
+
+	/**
 	 * Add values (for example scaled distance vector) to this collection
 	 * @param id (int) values id
 	 * @param result (vector<double>&) vector of values

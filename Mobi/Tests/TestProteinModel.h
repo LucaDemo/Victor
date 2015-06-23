@@ -56,8 +56,8 @@ protected:
 	    vector<unsigned int> models = vector<unsigned int>();
 	    models.push_back(1);
 	    models.push_back(4);
-	    models.push_back(6);
-	    cout << "Loading models 1, 4 and 6" << endl;
+	    models.push_back(8);
+	    cout << "Loading models 1, 4 and 8" << endl;
 	    prot.load(pl,0,models);
 	    cout << "Getting models back" << endl;
 	    CPPUNIT_ASSERT(prot.size() == 3);

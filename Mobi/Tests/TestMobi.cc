@@ -12,16 +12,18 @@
 #include <TestProteinModel.h>
 #include <TestVectorCollection.h>
 #include <TestTM.h>
+#include <TestMobiMethods.h>
 using namespace std;
 
 
 int main() {
 	CppUnit::TextUi::TestRunner runner;
 
-	cout << "Creating Test Suites: " << endl;
-	runner.addTest(TestVectorCollection::suite());
-	runner.addTest(TestProteinModel::suite());
-	runner.addTest(TestTM::suite());
+	cout << "Creating Test Suites:" << endl;
+//	runner.addTest(TestVectorCollection::suite());
+//	runner.addTest(TestProteinModel::suite());
+//	runner.addTest(TestTM::suite());
+	runner.addTest(TestMobiMethods::suite());
 	cout<< "Running the unit tests." << endl;
 
 	runner.run();

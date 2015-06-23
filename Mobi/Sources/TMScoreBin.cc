@@ -139,6 +139,7 @@ void TMScoreBin::spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel)
 	//Load and return protein object
 	*imposedModel = new ProteinModel();
 	pl.setModel(1);
+	cout.flush();
 	pl.loadProtein(**imposedModel);
 }
 
