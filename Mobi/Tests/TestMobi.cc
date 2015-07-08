@@ -13,6 +13,7 @@
 #include <TestVectorCollection.h>
 #include <TestTM.h>
 #include <TestMobiMethods.h>
+#include <MadTests.h>
 using namespace std;
 
 
@@ -23,8 +24,9 @@ int main() {
 //	runner.addTest(TestVectorCollection::suite());
 //	runner.addTest(TestProteinModel::suite());
 //	runner.addTest(TestTM::suite());
-	runner.addTest(TestMobiMethods::suite());
-	cout<< "Running the unit tests." << endl;
+//	runner.addTest(TestMobiMethods::suite());
+	runner.addTest(MadTests::suite());
+	cout<< "Running the unit tests. " << endl;
 
 	runner.run();
 	return 0;

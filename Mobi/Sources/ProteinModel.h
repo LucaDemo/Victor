@@ -39,13 +39,23 @@ namespace Victor { namespace Mobi {
 		ProteinModel() : Protein(), verbose(false){};
 		ProteinModel(const Protein& _orig) : Protein(_orig), verbose(false){};
 
+		ProteinModel* clone(){
+			ProteinModel* tmp = new ProteinModel();
+			tmp->copy(*this);
+			return tmp;
+		}
+
+		void copy(const ProteinModel& orig) {
+		    Protein::copy(orig);
+		}
+
 
 		void load(PdbLoader& pl, char chain, vector<unsigned int> models);
 		void load(PdbLoader& pl);
 
-		Spacer& getModel(unsigned int _model);
+		Spacer* getModel(unsigned int _model);
 		void SD(vector<double>& sd, ProteinModel& ref, AtomCode atom, double d0 = 4);
-		void SD(vector<double>& sd, Spacer& ref, AtomCode atom, double d0 = 4);
+		void SD(vector<double>& sd, Spacer* ref, AtomCode atom, double d0 = 4);
 
 		void setVerbose(bool v){
 			verbose = v;

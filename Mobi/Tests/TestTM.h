@@ -16,6 +16,7 @@
 #include <PdbLoader.h>
 #include <PdbSaver.h>
 #include <TMScoreBin.h>
+#include <AminoAcid.h>
 
 using namespace std;
 using namespace Victor::Mobi;
@@ -53,8 +54,8 @@ protected:
 			ERROR("Input file not found.", exception);
 		//models to load
 		vector<unsigned int> models = vector<unsigned int>();
-	    models.push_back(1);
-	    models.push_back(2);
+	    models.push_back(3);
+	    models.push_back(4);
 
 	    //loading models
 		PdbLoader pl(inFile);
@@ -69,16 +70,20 @@ protected:
 	    ProteinModel* superImposed;
 	    tmsb.TMImpose(prot,0,1,&superImposed);
 
+
+	    //AminoAcid& aa = prot.getModel(0)->getAmino(1);
+	    //Spacer* ss = prot.getModel(0);
+
 	    //save superimposed model to file
 	    std::ofstream fout;
 		PdbSaver ps(fout);
 		fout.open((TMDir + "superimposed_TM-Test.pdb").c_str());
-		ps.saveSpacer(superImposed->getModel(0));
+		ps.saveSpacer(*(superImposed->getModel(0)));
 		ps.endFile();
 		fout.close();
 
-		CPPUNIT_ASSERT(superImposed->getModel(0).sizeAmino() == 109);
-		CPPUNIT_ASSERT(superImposed->getModel(0).getAmino(0).getType() == "GLY");
+		CPPUNIT_ASSERT(superImposed->getModel(0)->sizeAmino() == 109);
+		CPPUNIT_ASSERT(superImposed->getModel(0)->getAmino(0).getType() == "GLY");
 		cout << "TM Test OK!" << endl;
 	}
 };

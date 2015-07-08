@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <ProteinModel.h>
+#include <TMScoreBinder.h>
 
 using namespace Victor::Biopool;
 using namespace Victor::Mobi;
@@ -27,13 +28,14 @@ namespace Victor { namespace Mobi {
 	/**
 	 * @brief TMScore functionalities through external binary.
 	 */
-	class TMScoreBin{
+	class TMScoreBin: public TMScoreBinder{
 	public:
 
 		/**
 		 * @brief Setup.
 		 * @param _binary (string) full path to binary TMScore file, must have execution permission
 		 * @param _tmp (string) full path to temp dir, must have write permission
+		 * @param _verbose (bool) verbosity
 		 */
 		TMScoreBin(std::string _binary = "TMScore", std::string _tmp = ".", bool _verbose = false) :
 			binary(_binary),
@@ -61,13 +63,18 @@ namespace Victor { namespace Mobi {
 		 */
 		virtual void TMImpose(ProteinModel& prot, unsigned int model, unsigned int native, ProteinModel** imposedModel);
 
+
 		/**
-		 * @brief the TMScore output is not pdb conformant. This static method read the output and fix it in a memory buffer.
-		 * Then loads a ProteinModel with the superimposed model only.
-		 * @param pdbFile (string) full path to TMScore output
-		 * @param imposedModel (ProteinModel**) double pointer of type PRoteinModel, as output
+		 * @brief Superimposition of two models through call to TMScore binary
+		 * The superimposed (rotated/traslated) model is then loaded in a ProteinModel using the double pointer provided.
+		 * @param prot1(ProteinModel&) reference to the fist ProteinModel
+		 * @param model1 (unsigned int) model#1 name in the first ProteinModel object
+		 * @param prot2(ProteinModel&) reference to the second ProteinModel
+		 * @param model2 (unsigned int) model#2 name in the second ProteinModel object
+		 * @param imposedModel(ProteinModel**) double pointer of type ProteinModel, as output
 		 */
-		virtual void spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel);
+		virtual void TMImpose(ProteinModel& prot1, unsigned int model1, ProteinModel& prot2, unsigned int model2, ProteinModel** imposedModel);
+
 
 		/**
 		 * Set verbosity.
@@ -81,7 +88,7 @@ namespace Victor { namespace Mobi {
 		/**
 		 * Default deconstructor
 		 */
-		~TMScoreBin(){};
+		virtual ~TMScoreBin(){};
 
 
 	private:

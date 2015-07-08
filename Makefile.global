@@ -77,7 +77,7 @@ ifeq ($(verbose), 3)
   USERFLAGS += -DVERBOSE=3
 endif
 
-CFLAGS = $(USERFLAGS) 
+CFLAGS = $(USERFLAGS)
 
 #
 # Tools 

@@ -42,6 +42,13 @@ public:
 	}
 
 	/**
+	 * Clear the collection deleting all elements in it
+	 */
+	void clear(){
+		results->clear();
+	}
+
+	/**
 	 * Add values (for example scaled distance vector) to this collection
 	 * @param id (int) values id
 	 * @param result (vector<double>&) vector of values
@@ -117,13 +124,25 @@ public:
 		vector<double> mean = this->mean();
 		vector<double> sd = vector<double>(this->vectorsSize(),0.0);
 		std::map<int,std::vector<double> >::const_iterator it;
-		for (it = this->results->begin(); it != this->results->end(); ++it)
-			for (unsigned int a = 0; a < this->vectorsSize(); a++)
-				sd[a] += pow(it->second[a] - mean[a],2);
+		for (it = this->results->begin(); it != this->results->end(); ++it)	//foreach distance record
+			for (unsigned int a = 0; a < this->vectorsSize(); a++)	//foreach residue
+				sd[a] += pow(it->second[a] - mean[a],2);	//cumulate the 2pow of distance minus mean
 		for (unsigned int a = 0; a < this->vectorsSize(); a++)
 			sd[a] = sqrt(sd[a] / this->size());
 		return sd;
 	}
+
+	vector<double> RMSD(){
+		vector<double> rmsd = vector<double>(this->vectorsSize(),0.0);
+		std::map<int,std::vector<double> >::const_iterator it;
+		for (it = this->results->begin(); it != this->results->end(); ++it)	//foreach distance record
+			for (unsigned int a = 0; a < this->vectorsSize(); a++)	//foreach residue
+				rmsd[a] += pow(it->second[a],2);	//cumulate the 2pow of distance
+		for (unsigned int a = 0; a < this->vectorsSize(); a++)	//foreach residue
+			rmsd[a] = sqrt(rmsd[a] / this->size());	//final value
+		return rmsd;
+	}
+
 
 protected:
 	std::map<int,std::vector<double> > *results;

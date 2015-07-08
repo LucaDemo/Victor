@@ -40,26 +40,36 @@ const string TMTMP_IN1 = "tmin1.pdb.tmp";
 const string TMTMP_IN2 = "tmin2.pdb.tmp";
 const string TMTMP_OUT = "tmout.pdb.tmp";
 
-void TMScoreBin::TMImpose(ProteinModel& prot, unsigned int model, unsigned int native, ProteinModel** imposedModel){
+/**
+ * @brief the TMScore output is not pdb conformant. This static method read the output and fix it in a memory buffer.
+ * Then loads a ProteinModel with the superimposed model only.
+ * @param pdbFile (string) full path to TMScore output
+ * @param imposedModel (ProteinModel**) double pointer of type PRoteinModel, as output
+ */
+void spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel);
 
-	std::stringstream sstm;
-	sstm << "TMScore between models " << model << " and " << native;
-	DEBUG_MSG(sstm.str());
+
+void TMScoreBin::TMImpose(ProteinModel& prot1, unsigned int model1, ProteinModel& prot2, unsigned int model2, ProteinModel** imposedModel){
+	if (verbose)
+		cout << "TMScore between models " << model1 << " and " << model2;
 
 	//Save spacers in pdb files
 	std::ofstream fout;
 	PdbSaver ps(fout);
 	fout.open((tmp + TMTMP_IN1).c_str());
-	ps.saveSpacer(prot.getModel(model));
+	ps.saveSpacer(*(prot1.getModel(model1)));
 	ps.endFile();
 	fout.close();
 	fout.open((tmp + TMTMP_IN2).c_str());
-	ps.saveSpacer(prot.getModel(native));
+	ps.saveSpacer(*(prot2.getModel(model2)));
 	ps.endFile();
 	fout.close();
-
 	//Call TMScore binary
 	return TMImpose((tmp + TMTMP_IN1), (tmp + TMTMP_IN2), imposedModel);
+}
+
+void TMScoreBin::TMImpose(ProteinModel& prot, unsigned int model1, unsigned int model2, ProteinModel** imposedModel){
+	return TMImpose(prot,model1,prot,model2,imposedModel);
 }
 
 void TMScoreBin::TMImpose(string modelFile, string nativeFile, ProteinModel** imposedModel){
@@ -89,6 +99,7 @@ void TMScoreBin::TMImpose(string modelFile, string nativeFile, ProteinModel** im
 						char * tok;
 						tok = strtok(buffer,"\n\r");
 						while (tok != NULL){
+							//cout << string(tok) << endl;
 							if (string(tok).find("TM-score") == 0)
 								if (string(tok).find("=") > 0)
 									score = std::strtod(string(tok).substr(string(tok).find("=")+2,6).c_str(),NULL);
@@ -109,7 +120,7 @@ void TMScoreBin::TMImpose(string modelFile, string nativeFile, ProteinModel** im
 	return spacerFromTMOutput(tmp + TMTMP_OUT + "_atm", imposedModel);
 }
 
-void TMScoreBin::spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel){
+void spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel){
 	if (access(pdbFile.c_str(), R_OK) != 0)
 		ERROR("Cannot read pdb file to fix",exception);
 
@@ -134,8 +145,7 @@ void TMScoreBin::spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel)
 	buffer.seekg(0);
 	//Load from memory buffer
 	PdbLoader pl(buffer);
-	if (!verbose)
-		pl.setNoVerbose();
+	pl.setNoVerbose();
 	//Load and return protein object
 	*imposedModel = new ProteinModel();
 	pl.setModel(1);
