@@ -36,7 +36,7 @@ namespace Victor { namespace Mobi {
 	 */
 	class ProteinModel : public Protein{
 	public:
-		ProteinModel() : Protein(), verbose(false){};
+		ProteinModel() : Protein(), verbose(false){modelsID = vector<unsigned int>(0);};
 		ProteinModel(const Protein& _orig) : Protein(_orig), verbose(false){};
 
 		ProteinModel* clone(){
@@ -50,8 +50,8 @@ namespace Victor { namespace Mobi {
 		}
 
 
-		void load(PdbLoader& pl, char chain, vector<unsigned int> models);
-		void load(PdbLoader& pl);
+		vector<unsigned int> load(PdbLoader& pl, vector<unsigned int> models);
+		vector<unsigned int> load(PdbLoader& pl);
 
 		Spacer* getModel(unsigned int _model);
 		void SD(vector<double>& sd, ProteinModel& ref, AtomCode atom, double d0 = 4);
@@ -60,8 +60,12 @@ namespace Victor { namespace Mobi {
 		void setVerbose(bool v){
 			verbose = v;
 		}
+
+		const vector<unsigned int>& getModelsID(){ return modelsID;}
+
 	private:
 		bool verbose;
+		vector<unsigned int> modelsID;
 	};
 }}
 

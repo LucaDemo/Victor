@@ -50,8 +50,9 @@ namespace Victor { namespace Mobi {
 		 * @param modelFile (string) full path to model#1 file
 		 * @param nativeFile (string) full path to model#2 file
 		 * @param imposedModel(ProteinModel**) double pointer of type ProteinModel, as output
+		 * @return (double) TMScore
 		 */
-		virtual void TMImpose(string modelFile, string nativeFile, ProteinModel** imposedModel);
+		virtual double TMScore(string modelFile, string nativeFile, ProteinModel** imposedModel);
 
 		/**
 		 * @brief Given a ProteinModel call TMScore binary to superimpose two models contained in it.
@@ -60,8 +61,9 @@ namespace Victor { namespace Mobi {
 		 * @param model (unsigned int) model#1 name in ProteinModel object
 		 * @param native (unsigned int) model#2 name in ProteinModel object
 		 * @param imposedModel(ProteinModel**) double pointer of type ProteinModel, as output
+		 * @return (double) TMScore
 		 */
-		virtual void TMImpose(ProteinModel& prot, unsigned int model, unsigned int native, ProteinModel** imposedModel);
+		virtual double TMScore(ProteinModel& prot, unsigned int model, unsigned int native, ProteinModel** imposedModel);
 
 
 		/**
@@ -72,8 +74,9 @@ namespace Victor { namespace Mobi {
 		 * @param prot2(ProteinModel&) reference to the second ProteinModel
 		 * @param model2 (unsigned int) model#2 name in the second ProteinModel object
 		 * @param imposedModel(ProteinModel**) double pointer of type ProteinModel, as output
+		 * @return (double) TMScore
 		 */
-		virtual void TMImpose(ProteinModel& prot1, unsigned int model1, ProteinModel& prot2, unsigned int model2, ProteinModel** imposedModel);
+		virtual double TMScore(ProteinModel& prot1, unsigned int model1, ProteinModel& prot2, unsigned int model2, ProteinModel** imposedModel);
 
 
 		/**

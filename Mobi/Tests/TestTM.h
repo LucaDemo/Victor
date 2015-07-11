@@ -61,18 +61,13 @@ protected:
 		PdbLoader pl(inFile);
 		pl.setNoVerbose();
 		ProteinModel prot;
-	    cout << "Loading models 1 and 2" << endl;
-	    prot.load(pl,0,models);
+	    prot.load(pl,models);
 
 	    //calling TMScore bin
-	    cout << "TM Score binary call" << endl;
 	    TMScoreBin tmsb(TMDir+"TMScore", TMDir, false);
 	    ProteinModel* superImposed;
-	    tmsb.TMImpose(prot,0,1,&superImposed);
+	    tmsb.TMScore(prot,0,1,&superImposed);
 
-
-	    //AminoAcid& aa = prot.getModel(0)->getAmino(1);
-	    //Spacer* ss = prot.getModel(0);
 
 	    //save superimposed model to file
 	    std::ofstream fout;
@@ -84,7 +79,6 @@ protected:
 
 		CPPUNIT_ASSERT(superImposed->getModel(0)->sizeAmino() == 109);
 		CPPUNIT_ASSERT(superImposed->getModel(0)->getAmino(0).getType() == "GLY");
-		cout << "TM Test OK!" << endl;
 	}
 };
 

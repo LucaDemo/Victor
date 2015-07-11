@@ -62,6 +62,19 @@ public:
 	}
 
 	/**
+	 * Add values (for example scaled distance vector) to this collection
+	 * @param m1 (int) first model id
+	 * @param m2 (int) second model id
+	 * @param result (vector<double>&) vector of values
+	 */
+	void addValue(int m1, int m2, std::vector<double>& result){
+		if (size() > 0)
+			if (result.size() != vectorsSize())
+				ERROR("Trying to add a result of non compatible size",exception);
+		results->insert(std::make_pair(VectorCollection::id(m1,m2),result));
+	}
+
+	/**
 	 * Return values given the id
 	 * @param id (int) id to search
 	 * @return (vector<double>&) values, if found
@@ -73,6 +86,40 @@ public:
 		else
 			ERROR("Unable to find values with given id",exception);
 			return vector<double>();	//never reached, just to hide warnings
+	}
+
+	/**
+	 * Returns a list of all the model partecipating in this collection
+	 * @return (vector<int>) models
+	 */
+	vector<int> getModels(){
+		vector<int> models;
+		for (std::map<int,std::vector<double> >::const_iterator it = this->results->begin(); it != this->results->end(); ++it){
+			if (std::find(models.begin(), models.end(), VectorCollection::modelsFromID(it->first)[0]) == models.end())
+				models.push_back(VectorCollection::modelsFromID(it->first)[0]);
+			if (std::find(models.begin(), models.end(), VectorCollection::modelsFromID(it->first)[1]) == models.end())
+							models.push_back(VectorCollection::modelsFromID(it->first)[1]);
+		}
+		return models;
+	}
+
+	/**
+	 * Returns all records relative to the specified model
+	 * @param model (int) the model to search
+	 * @return (VectorCollection) subcollection relative to the model
+	 */
+	VectorCollection getValuesByModel(int model){
+		VectorCollection outVC;
+		std::map<int,std::vector<double> >::iterator it = this->results->begin();
+		while (it != this->results->end()){
+			if (it->first / delimiter == model)
+				outVC.addValue(it->first, it->second);
+			else
+				if (it->first % delimiter == model)
+					outVC.addValue(it->first, it->second);
+			it++;
+		}
+		return outVC;
 	}
 
 	/**
@@ -132,16 +179,45 @@ public:
 		return sd;
 	}
 
-	vector<double> RMSD(){
-		vector<double> rmsd = vector<double>(this->vectorsSize(),0.0);
+	/**
+	 * Calculate rmsd for all distance records inside this VectorCollection and return their average
+	 * @return (double) mean rmsd
+	 */
+	double rmsd(){
+		double rmsd = 0;
+		double singleRmsd;
 		std::map<int,std::vector<double> >::const_iterator it;
-		for (it = this->results->begin(); it != this->results->end(); ++it)	//foreach distance record
-			for (unsigned int a = 0; a < this->vectorsSize(); a++)	//foreach residue
-				rmsd[a] += pow(it->second[a],2);	//cumulate the 2pow of distance
-		for (unsigned int a = 0; a < this->vectorsSize(); a++)	//foreach residue
-			rmsd[a] = sqrt(rmsd[a] / this->size());	//final value
-		return rmsd;
+		for (it = this->results->begin(); it != this->results->end(); ++it){	//foreach distance record
+			singleRmsd = 0;
+			for (unsigned int i = 0; i < this->vectorsSize(); i++)	//foreach residue
+				singleRmsd += pow(it->second[i],2);	//cumulate the 2pow of distance
+			singleRmsd = sqrt(singleRmsd / this->vectorsSize());
+			rmsd += singleRmsd;
+		}
+		return (rmsd / results->size());
 	}
+
+	/**
+	 * Short output... debug purpouses
+	 */
+	void print(){
+		std::map<int,std::vector<double> >::iterator it;
+		for (it = this->results->begin(); it != this->results->end(); ++it)
+			cout << it->first << " => [" << it->second[0] << "," << it->second[1] << ", ...]" << endl;
+	}
+
+	static const int delimiter = 1000;
+	static int id(int m1, int m2){
+		return m1*delimiter + m2;
+	}
+	static vector<int> modelsFromID(int id){
+		vector<int> models(2);
+		models[0] = id / delimiter;
+		models[1] = id % delimiter;
+		return models;
+	}
+
+
 
 
 protected:

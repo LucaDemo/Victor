@@ -30,8 +30,8 @@ public:
 	static CppUnit::Test *suite() {
 	        CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("TestResults");
 
-//	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test1 - Populate the map",
-//	                &TestVectorCollection::testPopulation));
+	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test1 - Populate the map",
+	                &TestVectorCollection::testPopulation));
 
 	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test2 - Calculate means",
 	                &TestVectorCollection::testMeanSD));
@@ -50,43 +50,37 @@ protected:
 
 	void testPopulation(){
 		VectorCollection sdr = VectorCollection();
-		cout << endl << ">>>\tTestVectorCollection >>> test Population\nPopulating collection..." << endl;
+		cout << endl << ">>>\tTestVectorCollection >>> test Population..." << endl;
 		fillWith5Results10(sdr);
 		CPPUNIT_ASSERT(sdr.size() == 5);
 		CPPUNIT_ASSERT(sdr.vectorsSize() == 10);
-		cout << "Correctly populated!" << endl;
 		std::map<int,std::vector<double> >::const_iterator it = sdr.iterator();
 		CPPUNIT_ASSERT(it->second[5] == 5);
 		it++;
 		CPPUNIT_ASSERT(it->second[5] == 6);
 		it++;
 		CPPUNIT_ASSERT(it->second[5] == 7);
-		cout << "Correctly retrieved!" << endl;
+
+		vector<int> ids = sdr.getModels();
+		CPPUNIT_ASSERT(ids.size() == 6);
 	}
 
 	void testMeanSD(){
-		cout << endl << ">>>\tTestVectorCollection >>> test Mean\nPopulating collection..." << endl;
+		cout << endl << ">>>\tTestVectorCollection >>> test Mean..." << endl;
 		VectorCollection sdr = VectorCollection();
 		fillWith5Results10(sdr);
 		vector<double> mean = sdr.mean();
-		cout << "medie:" << endl;
 		for (unsigned int i = 0; i < 10; i++)
-			cout << mean[i] << endl;
-			//CPPUNIT_ASSERT(mean[i] == i+1);
-		cout << "Mean calculation correct!" << endl;
+			CPPUNIT_ASSERT(mean[i] == i+2);
 	}
 
 	void testSD(){
-		cout << endl << ">>>\tTestVectorCollection >>> test deviation calculation\nPopulating collection..." << endl;
+		cout << endl << ">>>\tTestVectorCollection >>> test deviation calculation..." << endl;
 		VectorCollection sdr = VectorCollection();
 		fillWith5Results10(sdr);
 		vector<double> sd = sdr.stdDev();
-		cout << "devs:" << endl;
-		for (unsigned int i = 0; i < 10; i++){
-			cout << sd[i] << endl;
-			//CPPUNIT_ASSERT(sd[i] > 0.816496 && sd[i] < 0.816498);
-		}
-
+		for (unsigned int i = 0; i < 10; i++)
+			CPPUNIT_ASSERT(sd[i] = sqrt(2));
 	}
 
 private:
@@ -105,11 +99,11 @@ private:
 			(*v4)[i] = i+3;
 			(*v5)[i] = i+4;
 		}
-		sdr.addValue(1,*v1);
-		sdr.addValue(2,*v2);
-		sdr.addValue(3,*v3);
-		sdr.addValue(4,*v4);
-		sdr.addValue(5,*v5);
+		sdr.addValue(1,2,*v1);
+		sdr.addValue(2,3,*v2);
+		sdr.addValue(3,4,*v3);
+		sdr.addValue(4,4,*v4);
+		sdr.addValue(5,7,*v5);
 	}
 };
 

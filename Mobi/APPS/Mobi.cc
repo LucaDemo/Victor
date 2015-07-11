@@ -26,48 +26,57 @@
 #include <GetArg.h>
 #include <ProteinModel.h>
 #include <TMScoreBin.h>
-#include <Debug.h>
+#include <MobiMethods.h>
+#include <MobiUtils.h>
+
 #include <String2Number.h>
+#include <unistd.h>
 
 using namespace Victor;
 using namespace Victor::Biopool;
 using namespace Victor::Mobi;
 
 void sShowHelp() {
-    cout << "Help message goes here...\n\n";
-}
-
-vector<std::string> splitString(std::string in, char del){
-	vector<std::string> toks;
-	std::stringstream ss(in);
-	std::string tok;
-
-	while(std::getline(ss, tok, del)){
-		toks.push_back(tok);
-	}
-	return toks;
+	cout << "Victor - Mobi NMR Mobility: 1.0\n"
+		<< "Mobility defined accordingly with http://protein.bio.unipd.it/mobi/"
+		<< "Options: \n"
+		<< "\t-i <filename> \t Input PDB file\n"
+		<< "\t-o <filename> \t Output mobility tracks to FASTA file (default stdout)\n"
+		<< "\t-p <filename> \t Output ordered models in PDB file (default is no output)\n"
+		<< "\t-c <id>       \t Chain identifier to read (default if first)\n"
+		<< "\t-m <number>   \t NMR models numbers to read, comma separated list (default is all) \n"
+		<< "\t-t	\t TMscore binary path (default is ./TMscore)\n"
+		<< "\t-v	\t verbose output\n"
+		<< "\t-d	\t even more verbose output (lot of details)\n"
+		<< "\t-h	\t shows this message\n";
 }
 
 int main(int argc, char* argv[]) {
+	cout << "Victor Mobi Mobility Calculator" << endl;
+	cout << "v. 0.1" << endl << endl;
 
-	DEBUG_MSG("Welcome to Mobi!");
 	//If -h specified, show help message
     if (getArg("h", argc, argv)) {
         sShowHelp();
         return 1;
     }
 
-    string inputFile, outputFile, chainID, modelList;
+    string inputFile, outputFile, outputPdb, tmbin, chainID, modelList;
+    bool saveFasta = true, savePdb = true, verbose, debug;
     vector<unsigned int> models;
-    unsigned int modevelNum;
 
-    bool chi;
 
     getArg("i", inputFile, argc, argv, "!");
     getArg("o", outputFile, argc, argv, "!");
+    getArg("p", outputPdb, argc, argv, "!");
+    getArg("t", tmbin, argc, argv, "!");
     getArg("c", chainID, argc, argv, "!");
     getArg("m", modelList, argc, argv, "!");
-    chi = getArg("-chi", argc, argv);
+    verbose = getArg("v", argc, argv);
+    debug = getArg("d", argc, argv);
+
+    if (debug)
+    	verbose = true;
 
     // Check input file
     if (inputFile == "!") {
@@ -77,13 +86,31 @@ int main(int argc, char* argv[]) {
     ifstream inFile(inputFile.c_str());
     if (!inFile)
         ERROR("Input file not found.", exception);
+    // Check output file
+    if (outputFile == "!") {
+    	saveFasta = false;
+    }
+    // Check output pdb
+    if (outputPdb == "!") {
+    	savePdb = false;
+    }
+    // check TM
+    if (tmbin == "!") {
+    	tmbin = "./TMscore";
+    }
+    if(access(tmbin.c_str(), X_OK) != 0){
+    	ERROR("TM binary (" + tmbin + ") does not exist or not executable.", exception);
+    }
 
+
+
+    //MOBI
     PdbLoader pl(inFile);
-    vector<Atom*> model;
-
     // Set PdbLoader variables
-    if (!getArg("v", argc, argv)) {
+    if (!debug) {
         pl.setNoVerbose();
+    }else{
+    	pl.setVerbose();
     }
 
     // User selected chain
@@ -92,72 +119,81 @@ int main(int argc, char* argv[]) {
             ERROR("You can choose only 1 chain", error);
         pl.setChain(chainID[0]);
         pl.checkAndSetChain();
+        if (verbose)
+        	cout << "Selected chain: " << chainID[0] << endl;
     }// First chain
     else {
         pl.setChain(pl.getAllChains()[0]);
+        if (verbose)
+        	cout << "Selected chain: " << pl.getAllChains()[0] << endl;
     }
 
     // User selected models
     if (modelList != "!"){
     	models = sToVectorOfUIntDEF(translate(modelList,',',' '));
     		for (unsigned int i = 0; i < models.size(); i++)
-    			if (models[i] > pl.getMaxModels())
+    			if (models[i] > pl.getMaxModels() || models[i] < 1)
     				ERROR("You specified out of bound model number(s). Max for this input pdb is " + pl.getMaxModels(), exception);
     }else{
     	for (unsigned int i = 1; i <= pl.getMaxModels(); i++)
     		models.push_back(i);
     }
-
+    if (verbose){
+    	cout << "Selected models: ";
+    	for (unsigned int i = 0; i < models.size(); i++)
+    		cout << models[i] << " ";
+    	cout << endl;
+    }
 
     // Load the protein object
+    ProteinModel* prot = new ProteinModel();
+    if (debug)
+    	prot->setVerbose(true);
+    else
+    	prot->setVerbose(false);
+    if (verbose)
+    	cout << "Loading models..." << endl;
+    prot->load(pl,models);
+    cout << endl;
 
-    // Open the proper output stream (file or stdout)
-    //std::ofstream fout;
+    // TMscore: here we use the external binary
+    TMScoreBinder* tm = new TMScoreBin(tmbin,".");
+    // Default constructor for default thresholds
+    MobiMethods mm;
+    if (verbose)
+    	mm.verbosity(1);	//Outputs tracks on cout
+    if (debug)
+    	mm.verbosity(2);	//Output tracks and other calculation details
 
+    //Mobility
+    cout << "Mobility calculation..." << endl;
+	vector<int> mobility = mm.mobiMobility(prot,tm);
 
-    ProteinModel prot;
-    //PdbSaver ps(cout);
-    models = vector<unsigned int>();
-    models.push_back(3);
-    models.push_back(1);
-    models.push_back(4);
-    models.push_back(6);
-    models.push_back(5);
-    models.push_back(8);
-    models.push_back(7);
-	models.push_back(2);
-    //models.push_back(3);
-    prot.load(pl,0,models);
+	if (verbose){	//cout output
+		MobiUtils::printFastaFile(mm);
+		cout << endl;
+	}
+	if (saveFasta){	//save fasta
+		ofstream fastaOut(outputFile.c_str());
+		MobiUtils::printFastaFile(mm,fastaOut);
+		fastaOut.close();
+		if (verbose)
+			cout << "Tracks saved in FASTA file: " << outputFile << endl;
+	}
 
+	if (savePdb){	//save Pdb
+		ofstream pdbOut(outputPdb.c_str());
+		MobiUtils::saveMobiPdb(prot,MobiUtils::sortModels(mm.getDistances()),mm.getSDMeans(), mm.getSDDevs(),pdbOut);
+		pdbOut.close();
+		if (verbose)
+			cout << "Models saved in Pdb file: " << outputPdb << endl;
+	}
 
-    /*
-    for (unsigned int i = 1; i < 5; i++){
-    	std::ostringstream ss;
-    	ss << "pdbout" << i << ".pdb";
-    	fout.open(ss.str().c_str());
-    	ps.saveSpacer(prot1.getModel(i));
-    	ps.endFile();
-    	fout.close();
-    }
-	*/
-    TMScoreBin tm("TMScore",".");
-    Spacer sss;
-    //cout << "TM-score = " << tm.tms(prot, 0, 1, sss);
+	//Close
+	delete prot;
+	delete tm;
 
-
-    //dtf
-
-
-    /*
-    ProteinModel prot2;
-    fout.open("pdbout2.pdb");
-	//pl.setModel(2);
-	prot2.load(pl);
-    //prot2.load(pl);
-	cout << "sizeProtein = " << prot2.sizeProtein() << endl;
-	ps.saveSpacer(prot2.getModel(0));
-	ps.endFile();
-	fout.close();
-	*/
+	//Goodbye
+	cout << endl << "Done." << endl;
     return 0;
 }

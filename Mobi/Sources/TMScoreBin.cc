@@ -49,7 +49,7 @@ const string TMTMP_OUT = "tmout.pdb.tmp";
 void spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel);
 
 
-void TMScoreBin::TMImpose(ProteinModel& prot1, unsigned int model1, ProteinModel& prot2, unsigned int model2, ProteinModel** imposedModel){
+double TMScoreBin::TMScore(ProteinModel& prot1, unsigned int model1, ProteinModel& prot2, unsigned int model2, ProteinModel** imposedModel){
 	if (verbose)
 		cout << "TMScore between models " << model1 << " and " << model2;
 
@@ -65,14 +65,14 @@ void TMScoreBin::TMImpose(ProteinModel& prot1, unsigned int model1, ProteinModel
 	ps.endFile();
 	fout.close();
 	//Call TMScore binary
-	return TMImpose((tmp + TMTMP_IN1), (tmp + TMTMP_IN2), imposedModel);
+	return TMScore((tmp + TMTMP_IN1), (tmp + TMTMP_IN2), imposedModel);
 }
 
-void TMScoreBin::TMImpose(ProteinModel& prot, unsigned int model1, unsigned int model2, ProteinModel** imposedModel){
-	return TMImpose(prot,model1,prot,model2,imposedModel);
+double TMScoreBin::TMScore(ProteinModel& prot, unsigned int model1, unsigned int model2, ProteinModel** imposedModel){
+	return TMScore(prot,model1,prot,model2,imposedModel);
 }
 
-void TMScoreBin::TMImpose(string modelFile, string nativeFile, ProteinModel** imposedModel){
+double TMScoreBin::TMScore(string modelFile, string nativeFile, ProteinModel** imposedModel){
 	double score = -1;
 	if (access(modelFile.c_str(), R_OK) == 0 && access(nativeFile.c_str(), R_OK) == 0){
 		if(access(binary.c_str(), X_OK) == 0){
@@ -117,7 +117,8 @@ void TMScoreBin::TMImpose(string modelFile, string nativeFile, ProteinModel** im
 	else
 		ERROR("No access to pdb files " + modelFile + " or " + nativeFile, exception);
 
-	return spacerFromTMOutput(tmp + TMTMP_OUT + "_atm", imposedModel);
+	spacerFromTMOutput(tmp + TMTMP_OUT + "_atm", imposedModel);
+	return score;
 }
 
 void spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel){

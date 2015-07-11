@@ -57,9 +57,7 @@ protected:
 	    models.push_back(1);
 	    models.push_back(4);
 	    models.push_back(8);
-	    cout << "Loading models 1, 4 and 8" << endl;
-	    prot.load(pl,0,models);
-	    cout << "Getting models back" << endl;
+	    prot.load(pl,models);
 	    CPPUNIT_ASSERT(prot.size() == 3);
 	    Spacer* m1 = prot.getModel(0);
 	    Spacer* m2 = prot.getModel(1);
@@ -67,6 +65,5 @@ protected:
 	    CPPUNIT_ASSERT(m1->getAmino(0).getType() == "GLY");
 	    CPPUNIT_ASSERT(m2->getAmino(1).getType() == "SER");
 	    CPPUNIT_ASSERT(m3->getAmino(2).getType() == "GLY");
-	    cout << "All fine!" << endl;
 	}
 };

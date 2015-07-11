@@ -9,8 +9,8 @@
 #include <Spacer.h>
 #include <PdbLoader.h>
 #include <MobiMethods.h>
+#include <MobiUtils.h>
 #include <TMScoreBin.h>
-#include <./Utils.h>
 
 using namespace Victor::Biopool;
 using namespace Victor::Mobi;
@@ -43,17 +43,16 @@ void MobiMethods::distances(ProteinModel* protein, TMScoreBinder* tm, VectorColl
 	//Perform superimposition for every model pair
 	for (unsigned int i = 0; i < protein->size(); i++)
 		for (unsigned int j = i+1; j < protein->size(); j++){
-			tm->TMImpose(*protein,i,j,&imposed);
+			tm->TMScore(*protein,i,j,&imposed);
 			tmpDist = scaledDistance(imposed->getModel(0),protein->getModel(j), mm.getAtom(), mm.getD0());
 			scaledDist.addValue((i*1000 + j), tmpDist);
-
 			tmpDist = distance(imposed->getModel(0),protein->getModel(j), mm.getAtom());
 			dist.addValue((i*1000 + j), tmpDist);
 			delete imposed;
 		}
 }
 
-static vector<double> distance(Spacer* mod1, Spacer* mod2, AtomCode atom){
+vector<double> MobiMethods::distance(Spacer* mod1, Spacer* mod2, AtomCode atom){
 	if (mod2->size() != mod1->size())
 		ERROR("Reference protein spacer has a different number of Aminos",exception);
 	vector<double> dist(mod1->size());
@@ -69,7 +68,7 @@ static vector<double> distance(Spacer* mod1, Spacer* mod2, AtomCode atom){
 }
 
 
-static vector<double> scaledDistance(Spacer* mod1, Spacer* mod2, AtomCode atom, double d0){
+vector<double> MobiMethods::scaledDistance(Spacer* mod1, Spacer* mod2, AtomCode atom, double d0){
 	if (mod2->size() != mod1->size())
 		ERROR("Reference protein spacer has a different number of Aminos",exception);
 	vector<double> sd(mod1->size());
@@ -110,7 +109,7 @@ void MobiMethods::psis(ProteinModel* protein, VectorCollection& psis){
 	}
 }
 
-vector<int> MobiMethods::DSSP(ProteinModel* protein){
+vector<int> MobiMethods::secondaryMobi(ProteinModel* protein){
 	//Check for errors in protein
 	unsigned int const protLen = protein->size();
 	if (protLen < 1)
@@ -157,88 +156,50 @@ vector<int> MobiMethods::DSSP(ProteinModel* protein){
 
 
 
-vector<int> MobiMethods::mobiMobility(ProteinModel* protein, TMScoreBinder* tm, MobiMethods& mm){
+vector<int> MobiMethods::mobiMobility(ProteinModel* protein, TMScoreBinder* tm){
 	//Scaled Distances
-	if (mm.verbosity() > 1)
-		cout << "Scaled Distances..." << endl;
-    VectorCollection scaledDist;	//Scaled distances
-    VectorCollection dist;			//"Simple" distances
-    distances(protein,tm,scaledDist,dist,mm);
+    distances(protein,tm,scaledDist,dist,*this);
+
+    //Set sequence
+    for (unsigned int i = 0; i < protein->getModel(0)->sizeAmino(); i++)
+    	sequence.push_back(protein->getModel(0)->getAmino(i).getType1L());
 
     //Scaled Distances Mean
-    vector<double> SDMeans = scaledDist.mean();
-    vector<int> SDMeanMobility(SDMeans.size());
+    SDMeans = scaledDist.mean();
+    SDMeanMobility= vector<int>(SDMeans.size());
     for (unsigned int i = 0; i < SDMeans.size(); i++)
-    	SDMeanMobility[i] = SDMeans[i] < mm.getSDTh() ? 1 : 0;
+    	SDMeanMobility[i] = SDMeans[i] < sd_th ? 1 : 0;
     //Scaled Distances deviations
-    if (mm.verbosity() > 1)
-		cout << "Scaled Distances deviations..." << endl;
-    vector<double> SDDevs = scaledDist.stdDev();
-    vector<int> SDDevsMobility(SDDevs.size());
+    SDDevs = scaledDist.stdDev();
+    SDDevsMobility = vector<int>(SDDevs.size());
 	for (unsigned int i = 0; i < SDDevs.size(); i++)
-		SDDevsMobility[i] = SDDevs[i] > mm.getSDSDTh() ? 1 : 0;
+		SDDevsMobility[i] = SDDevs[i] > sdsd_th ? 1 : 0;
 
 	VectorCollection angles;
 	//Psi angles
-	if (mm.verbosity() > 1)
-		cout << "Psi angles..." << endl;
 	psis(protein,angles);	//values are cleared inside getPhis
-	vector<double> psis = angles.stdDev();
-	vector<int> PsiMobility(psis.size());
-	for (unsigned int i = 0; i < psis.size(); i++)
-		PsiMobility[i] = psis[i] > mm.getPsiTh() ? 1 : 0;
+	psisAngles = angles.stdDev();
+	PsiMobility = vector<int>(psisAngles.size());
+	for (unsigned int i = 0; i < psisAngles.size(); i++)
+		PsiMobility[i] = psisAngles[i] > psi_th ? 1 : 0;
 	//Phi angles
-	if (mm.verbosity() > 1)
-		cout << "Phi angles..." << endl;
 	phis(protein,angles);	//values are cleared inside getPhis
-	vector<double> phis = angles.stdDev();
-	vector<int> PhiMobility(phis.size());
-	for (unsigned int i = 0; i < phis.size(); i++)
-		PhiMobility[i] = phis[i] > mm.getPhiTh() ? 1 : 0;
-	//DSSP
-	if (mm.verbosity() > 1)
-			cout << "DSSP..." << endl;
-	vector<int> dsspMobility = DSSP(protein);
+	phisAngles = angles.stdDev();
+	PhiMobility = vector<int>(phisAngles.size());
+	for (unsigned int i = 0; i < phisAngles.size(); i++)
+		PhiMobility[i] = phisAngles[i] > phi_th ? 1 : 0;
+	//Secondary mobility
+	secMobility = secondaryMobi(protein);
 
 	//Calculate Mobi Mobility
-	vector<int> mobiMob = SDFilters(SDMeanMobility, SDDevsMobility, dsspMobility, PhiMobility, PsiMobility, mm);
+	mobiMob = SDFilters(SDMeanMobility, SDDevsMobility, secMobility, PhiMobility, PsiMobility, *this);
 
-
-	//Output
-	if (mm.verbosity() > 0){
-		cout << "\n\n*** MOBI Mobility summary ***" << endl;
-		cout << endl << ">Scaled Distance Mean. Th = " << mm.getSDTh() << endl;
-		for (unsigned int i = 0; i < SDMeanMobility.size(); i++)
-			cout << (SDMeanMobility[i] == 1 ? "M" : ".");
-		cout << endl << ">Scaled Distance Deviation. Th = " << mm.getSDSDTh() << endl;
-		for (unsigned int i = 0; i < SDDevsMobility.size(); i++)
-			cout << (SDDevsMobility[i] == 1 ? "M" : ".");
-		cout << endl << ">Phi angle deviation. Th = " << mm.getPhiTh() << endl;
-		for (unsigned int i = 0; i < PhiMobility.size(); i++)
-			cout << (PhiMobility[i] == 1 ? "M" : ".");
-		cout << endl << ">Psi angle deviation. Th = " << mm.getPsiTh() << endl;
-		for (unsigned int i = 0; i < PsiMobility.size(); i++)
-			cout << (PsiMobility[i] == 1 ? "M" : ".");
-		cout << endl << ">DSSP mobility." << endl;
-		for (unsigned int i = 0; i < dsspMobility.size(); i++)
-			cout << (dsspMobility[i] == 1 ? "M" : (dsspMobility[i] == 2 ? "c" : "."));
-		cout << endl << ">All."<< endl;
-		for (unsigned int i = 0; i < mobiMob.size(); i++)
-			cout << (mobiMob[i] == 1 ? "M" : ".");
-	}
-
-	//RMSD
-	vector<double> rmsd = dist.RMSD();
-	//cout << "RMSD:" << endl;
-	cout << endl;
-	for (unsigned int i = 0; i < SDDevs.size(); i++)
-		cout << SDDevs[i] << endl;
 	return mobiMob;
 }
 
-vector<int> MobiMethods::SDFilters(vector<int> sdm, vector<int> const &sdsd,
+vector<int> MobiMethods::SDFilters(vector<int> const &sd, vector<int> const &sdsd,
 		vector<int> const &dssp, vector<int> const &phis, vector<int> const &psis, MobiMethods &mm){
-
+	vector<int> sdm = sd;
 	if (mm.verbosity() > 1)
 		printVector(sdm,"Initial SD");
 	//DSSP non-mobile => 1->0 in SD

@@ -36,41 +36,31 @@ using namespace Victor::Biopool;
  * @param chain (char) name of the chain to load, 0 = first chain (default)
  * @param model (vector<unsigned int>) models to load (accordind to pdb file model names),
  */
-void ProteinModel::load(PdbLoader& pl, char chain, vector<unsigned int> models){
+vector<unsigned int> ProteinModel::load(PdbLoader& pl, vector<unsigned int> models){
 	if (verbose)
 		cout << "Loading protein models..." <<endl;
-	//ChainSelection
-	if (chain == 0)
-		pl.setAllChains();
-	else
-		pl.setChain(pl.getAllChains()[0]);
 
 	if (!verbose)
 		pl.setNoVerbose();
 	//Load models
 	for(unsigned int i = 0; i < models.size(); i++){
-		if (verbose){
+		if (verbose)
 			cout << "\t>>>model#" << models[i] << endl;
-			cout.flush();
-		}
 		pl.setModel(models[i]);
 		pl.checkModel();
 
 		this->Protein::load(pl);
+		this->modelsID.push_back(models[i]);
 	}
+	return models;
 }
 
-void ProteinModel::load(PdbLoader& pl){
-	if (!verbose)
-		pl.setNoVerbose();
+vector<unsigned int> ProteinModel::load(PdbLoader& pl){
+	vector<unsigned int> models;
 	//Load Models
-	for(unsigned int i = 1; i <= pl.getMaxModels(); i++){
-		if (verbose)
-			cout << "\t>>>model#" << i << endl;
-		pl.setModel(i);
-		pl.checkModel();
-		this->Protein::load(pl);
-	}
+	for(unsigned int i = 1; i <= pl.getMaxModels(); i++)
+		models.push_back(i);
+	return load(pl,models);
 }
 
 /**
