@@ -1,17 +1,29 @@
-/*
- * TMScoreBin.h
- *
- *  Created on: 01/giu/2015
- *      Author: luca
- */
+/*  This file is part of Victor.
 
+    Victor is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Victor is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Victor.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/*!
+ *  \author    Luca Demo
+ *  \date      2015
+ */
 #ifndef MOBI_SOURCES_TMSCOREBIN_H_
 #define MOBI_SOURCES_TMSCOREBIN_H_
 
 
 #include <iostream>
 #include <string>
-#include <ProteinModel.h>
+#include <MobiProtein.h>
 #include <TMScoreBinder.h>
 
 using namespace Victor::Biopool;
@@ -19,9 +31,10 @@ using namespace Victor::Mobi;
 using namespace std;
 
 
-extern const std::string TMTMP_IN1;
-extern const std::string TMTMP_IN2;
-extern const std::string TMTMP_OUT;
+//extern const std::string TMTMP_IN1;
+//extern const std::string TMTMP_IN2;
+//extern const std::string TMTMP_OUT;
+
 
 
 namespace Victor { namespace Mobi {
@@ -37,7 +50,7 @@ namespace Victor { namespace Mobi {
 		 * @param _tmp (string) full path to temp dir, must have write permission
 		 * @param _verbose (bool) verbosity
 		 */
-		TMScoreBin(std::string _binary = "TMScore", std::string _tmp = ".", bool _verbose = false) :
+		TMScoreBin(std::string _binary = "TMscore", std::string _tmp = ".", bool _verbose = false) :
 			binary(_binary),
 			tmp(_tmp.substr(_tmp.length()-1,1) == "/" ? _tmp : _tmp + "/"),
 			verbose(_verbose)
@@ -46,43 +59,43 @@ namespace Victor { namespace Mobi {
 		/**
 		 * @brief Given two pdb files containing each a model of the same protein,
 		 * call TMScore binary to superimpose the first over the second. The superimposed (rotated/traslated)
-		 * model is then loaded in a ProteinModel using the double pointer provided.
-		 * @param modelFile (string) full path to model#1 file
-		 * @param nativeFile (string) full path to model#2 file
-		 * @param imposedModel(ProteinModel**) double pointer of type ProteinModel, as output
-		 * @return (double) TMScore
+		 * model is then loaded in a MobiProtein using the double pointer provided.
+		 * @param model1 full path to model#1 file
+		 * @param model2 full path to model#2 file
+		 * @param imposedModel output
+		 * @return TMScore
 		 */
-		virtual double TMScore(string modelFile, string nativeFile, ProteinModel** imposedModel);
+		virtual double TMScore(string model1, string model2, MobiProtein** imposedModel);
 
 		/**
 		 * @brief Given a ProteinModel call TMScore binary to superimpose two models contained in it.
 		 * The superimposed (rotated/traslated) model is then loaded in a ProteinModel using the double pointer provided.
-		 * @param prot(ProteinModel&) reference to ProteinModel object
-		 * @param model (unsigned int) model#1 name in ProteinModel object
-		 * @param native (unsigned int) model#2 name in ProteinModel object
-		 * @param imposedModel(ProteinModel**) double pointer of type ProteinModel, as output
+		 * @param prot reference to MobiProtein object
+		 * @param model1 model#1 name in MobiProtein object
+		 * @param model2 model#2 name in MobiProtein object
+		 * @param imposedModel output
 		 * @return (double) TMScore
 		 */
-		virtual double TMScore(ProteinModel& prot, unsigned int model, unsigned int native, ProteinModel** imposedModel);
+		virtual double TMScore(MobiProtein& prot, unsigned int model1, unsigned int model2, MobiProtein** imposedModel);
 
 
 		/**
 		 * @brief Superimposition of two models through call to TMScore binary
 		 * The superimposed (rotated/traslated) model is then loaded in a ProteinModel using the double pointer provided.
-		 * @param prot1(ProteinModel&) reference to the fist ProteinModel
-		 * @param model1 (unsigned int) model#1 name in the first ProteinModel object
-		 * @param prot2(ProteinModel&) reference to the second ProteinModel
-		 * @param model2 (unsigned int) model#2 name in the second ProteinModel object
-		 * @param imposedModel(ProteinModel**) double pointer of type ProteinModel, as output
+		 * @param prot1 reference to the fist ProteinModel
+		 * @param model1 model#1 name in the first ProteinModel object
+		 * @param prot2  reference to the second ProteinModel
+		 * @param model2 model#2 name in the second ProteinModel object
+		 * @param imposedModel output
 		 * @return (double) TMScore
 		 */
-		virtual double TMScore(ProteinModel& prot1, unsigned int model1, ProteinModel& prot2, unsigned int model2, ProteinModel** imposedModel);
+		virtual double TMScore(MobiProtein& prot1, unsigned int model1, MobiProtein& prot2, unsigned int model2, MobiProtein** imposedModel);
 
 
 		/**
 		 * Set verbosity.
 		 * Verbosity is applied on PdbLoader instances.
-		 * @param v (bool) new verbosity option
+		 * @param v new verbosity option
 		 */
 		void setVerbose(bool v){
 			verbose = v;

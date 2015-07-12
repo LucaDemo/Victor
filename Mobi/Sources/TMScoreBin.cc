@@ -36,9 +36,7 @@ using namespace Victor::Mobi;
 using namespace Victor::Biopool;
 using namespace std;
 
-const string TMTMP_IN1 = "tmin1.pdb.tmp";
-const string TMTMP_IN2 = "tmin2.pdb.tmp";
-const string TMTMP_OUT = "tmout.pdb.tmp";
+
 
 /**
  * @brief the TMScore output is not pdb conformant. This static method read the output and fix it in a memory buffer.
@@ -46,10 +44,13 @@ const string TMTMP_OUT = "tmout.pdb.tmp";
  * @param pdbFile (string) full path to TMScore output
  * @param imposedModel (ProteinModel**) double pointer of type PRoteinModel, as output
  */
-void spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel);
+void spacerFromTMOutput(string pdbFile, MobiProtein** imposedModel);
 
 
-double TMScoreBin::TMScore(ProteinModel& prot1, unsigned int model1, ProteinModel& prot2, unsigned int model2, ProteinModel** imposedModel){
+double TMScoreBin::TMScore(MobiProtein& prot1, unsigned int model1, MobiProtein& prot2, unsigned int model2, MobiProtein** imposedModel){
+	string TMTMP_IN1 = "tmin1.pdb.tmp";		//Decided to not use global const
+	string TMTMP_IN2 = "tmin2.pdb.tmp";		//Decided to not use global const
+
 	if (verbose)
 		cout << "TMScore between models " << model1 << " and " << model2;
 
@@ -68,18 +69,21 @@ double TMScoreBin::TMScore(ProteinModel& prot1, unsigned int model1, ProteinMode
 	return TMScore((tmp + TMTMP_IN1), (tmp + TMTMP_IN2), imposedModel);
 }
 
-double TMScoreBin::TMScore(ProteinModel& prot, unsigned int model1, unsigned int model2, ProteinModel** imposedModel){
+double TMScoreBin::TMScore(MobiProtein& prot, unsigned int model1, unsigned int model2, MobiProtein** imposedModel){
 	return TMScore(prot,model1,prot,model2,imposedModel);
 }
 
-double TMScoreBin::TMScore(string modelFile, string nativeFile, ProteinModel** imposedModel){
+double TMScoreBin::TMScore(string model1, string model2, MobiProtein** imposedModel){
+	string TMTMP_OUT = "tmout.pdb.tmp";		//Decided to not use global const
 	double score = -1;
-	if (access(modelFile.c_str(), R_OK) == 0 && access(nativeFile.c_str(), R_OK) == 0){
+	if (access(model1.c_str(), R_OK) == 0 && access(model2.c_str(), R_OK) == 0){
 		if(access(binary.c_str(), X_OK) == 0){
 			pid_t pid;
 			//Pipeing TMS output
 			int pipefd[2];
-			pipe(pipefd);
+			if (pipe(pipefd))
+				ERROR("Piping failed for TMscore binary call",exception);
+
 			//Forking child for TMS
 			pid = fork();
 			if (pid < 0){
@@ -90,7 +94,7 @@ double TMScoreBin::TMScore(string modelFile, string nativeFile, ProteinModel** i
 					dup2(pipefd[1],1);	//stdout
 					dup2(pipefd[1],2);	//stderr
 					close(pipefd[1]);
-					if (execl(binary.c_str(),binary.c_str(), modelFile.c_str(),nativeFile.c_str(), "-o" , (tmp + TMTMP_OUT).c_str(),NULL))
+					if (execl(binary.c_str(),binary.c_str(), model1.c_str(),model2.c_str(), "-o" , (tmp + TMTMP_OUT).c_str(),NULL))
 						ERROR("Unable to exec",error);
 				} else{
 					//Read output from child pipe
@@ -115,13 +119,13 @@ double TMScoreBin::TMScore(string modelFile, string nativeFile, ProteinModel** i
 			ERROR("No access to " + binary + "  binary!",exception);
 	}
 	else
-		ERROR("No access to pdb files " + modelFile + " or " + nativeFile, exception);
+		ERROR("No access to pdb files " + model1 + " or " + model2, exception);
 
 	spacerFromTMOutput(tmp + TMTMP_OUT + "_atm", imposedModel);
 	return score;
 }
 
-void spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel){
+void spacerFromTMOutput(string pdbFile, MobiProtein** imposedModel){
 	if (access(pdbFile.c_str(), R_OK) != 0)
 		ERROR("Cannot read pdb file to fix",exception);
 
@@ -148,7 +152,7 @@ void spacerFromTMOutput(string pdbFile, ProteinModel** imposedModel){
 	PdbLoader pl(buffer);
 	pl.setNoVerbose();
 	//Load and return protein object
-	*imposedModel = new ProteinModel();
+	*imposedModel = new MobiProtein();
 	pl.setModel(1);
 	cout.flush();
 	pl.loadProtein(**imposedModel);

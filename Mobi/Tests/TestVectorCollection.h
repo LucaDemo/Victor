@@ -1,8 +1,21 @@
-/*
- * TestSDResults.h
- *
- *  Created on: 17/giu/2015
- *      Author: luca
+/*  This file is part of Victor.
+
+    Victor is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Victor is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Victor.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/*!
+ *  \author    Luca Demo
+ *  \date      2015
  */
 
 #include <iostream>
@@ -28,9 +41,9 @@ public:
 	virtual ~TestVectorCollection(){}
 
 	static CppUnit::Test *suite() {
-	        CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("TestResults");
+	        CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("TestVectorCollection");
 
-	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test1 - Populate the map",
+	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test1 - Populate the collection",
 	                &TestVectorCollection::testPopulation));
 
 	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test2 - Calculate means",
@@ -49,7 +62,7 @@ public:
 protected:
 
 	void testPopulation(){
-		VectorCollection sdr = VectorCollection();
+		VectorCollection<double> sdr = VectorCollection<double>();
 		cout << endl << ">>>\tTestVectorCollection >>> test Population..." << endl;
 		fillWith5Results10(sdr);
 		CPPUNIT_ASSERT(sdr.size() == 5);
@@ -67,7 +80,7 @@ protected:
 
 	void testMeanSD(){
 		cout << endl << ">>>\tTestVectorCollection >>> test Mean..." << endl;
-		VectorCollection sdr = VectorCollection();
+		VectorCollection<double> sdr = VectorCollection<double>();
 		fillWith5Results10(sdr);
 		vector<double> mean = sdr.mean();
 		for (unsigned int i = 0; i < 10; i++)
@@ -76,7 +89,7 @@ protected:
 
 	void testSD(){
 		cout << endl << ">>>\tTestVectorCollection >>> test deviation calculation..." << endl;
-		VectorCollection sdr = VectorCollection();
+		VectorCollection<double> sdr = VectorCollection<double>();
 		fillWith5Results10(sdr);
 		vector<double> sd = sdr.stdDev();
 		for (unsigned int i = 0; i < 10; i++)
@@ -85,7 +98,7 @@ protected:
 
 private:
 
-	void fillWith5Results10(VectorCollection& sdr){
+	void fillWith5Results10(VectorCollection<double>& sdr){
 		unsigned int modelLen = 10;
 		vector<double> *v1 = new vector<double>(modelLen);
 		vector<double> *v2 = new vector<double>(modelLen);

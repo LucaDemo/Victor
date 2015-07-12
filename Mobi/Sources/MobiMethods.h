@@ -1,10 +1,22 @@
-/*
- * MobiMethods.h
- *
- *  Created on: 18/giu/2015
- *      Author: luca
- */
+/*  This file is part of Victor.
 
+    Victor is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Victor is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Victor.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/*!
+ *  \author    Luca Demo
+ *  \date      2015
+ */
 #ifndef MOBI_SOURCES_MOBIMETHODS_H_
 #define MOBI_SOURCES_MOBIMETHODS_H_
 
@@ -29,9 +41,9 @@ extern const double DEF_SDSD_TH;
 extern const int DEF_VERBOSE;
 
 /**
- * This class provides static methods to calculate mobility with Mobi methods.\n
- * Can be instantiated to provide settings to the static methods. Default constructor provides
- * default mobi parameters.
+ * This class provides methods to calculate mobility.\n
+ * Can be instantiated to provide settings to the static methods and execute Mobi calculation.\n
+ * Default constructor provides default mobi parameters.
  */
 class MobiMethods{
 public:
@@ -69,44 +81,27 @@ public:
 	 * Calculates the Scaled and "simple" distances given the ProteinModel object containing all the models.
 	 * For all possible pair of models, Superimposition is performed and distances are calculated.
 	 * @param protein  pointer to protein object containing all the models
-	 * @param tm pointer to TMScore binary binder
+	 * @param tm pointer to TMScore binder
 	 * @param scaledDist destination of scaled distances
 	 * @param dist destination of distances
 	 * @param mm reference to MobiMethod object for mobi parameters
 	 */
-	static void distances(ProteinModel* protein, TMScoreBinder* tm, VectorCollection& scaledDist, VectorCollection& dist, MobiMethods &mm);
+	static void distances(MobiProtein* protein, TMScoreBinder* tm, VectorCollection<double>& scaledDist, VectorCollection<double>& dist, MobiMethods &mm);
 
-
-	/**
-	 * Calculate the scaled distance given two models
-	 * @param mod1 the first model (Spacer pointer)
-	 * @param mod2 the second model (Spacer pointer)
-	 * @param atom atom to base distance calculation on, default atom if not specified (CA)
-	 * @param d0  d0 normalization value, default value if not specified (4)
-	 */
-	static vector<double> scaledDistance(Spacer* mod1, Spacer* mod2, AtomCode atom = DEF_ATOM, double d0 = DEF_D0);
-
-	/**
-	 * Calculate the "simple" distance given two models.
-	 * @param mod1 the first model (Spacer pointer)
-	 * @param mod2 the second model (Spacer pointer)
-	 * @param atom (AtomCode) atom to base distance calcutation on, default atom if not specified (CA)
-	 */
-	static vector<double> distance(Spacer* mod1, Spacer* mod2, AtomCode atom = DEF_ATOM);
 
 	/**
 	 * Given a protein containing models, populate a VectorCollection of phi angles
 	 * @param protein pointer to the protein to elaborate
 	 * @param phis output VectorCollection
 	 */
-	static void phis(ProteinModel* protein, VectorCollection& phis);
+	static void phis(MobiProtein* protein, VectorCollection<double>& phis);
 
 	/**
 	 * Given a protein containing models, populate a VectorCollection of psi angles
 	 * @param protein pointer to the protein to elaborate
 	 * @param psis output VectorCollection
 	 */
-	static void psis(ProteinModel* protein, VectorCollection& psis);
+	static void psis(MobiProtein* protein, VectorCollection<double>& psis);
 
 	/**
 	 * Given a protein containing models, build DSSP mobility estimation.\n The returning
@@ -117,17 +112,15 @@ public:
 	 * @param protein reference to the protein
 	 * @return a vector<int> containing the secondary mobility estimation (0,1,2 values)
 	 */
-	static vector<int> secondaryMobi(ProteinModel* protein);
+	static vector<int> secondaryMobi(MobiProtein* protein);
 
 	/**
 	 * Performs mobility calculation
 	 * @param protein pointer to the protein to process
 	 * @param tm pointer to TM imposer
-	 * @param settings reference to MobiMethods object for Mobi parameters
-	 * @param output reference to output destination (fasta), default is cout
 	 * @return a vector<int> of mobility values (0,1)
 	 */
-	vector<int> mobiMobility(ProteinModel* protein, TMScoreBinder* tm);
+	vector<int> mobiMobility(MobiProtein* protein, TMScoreBinder* tm);
 
 	/**
 	 * Applies Mobi filters to Scaled Distance mobility track to obtain final mobility values
@@ -144,12 +137,7 @@ public:
 
 	/**
 	 * Applies Mobi filters to Scaled Distance mobility track to obtain final mobility values
-	 * @param sdm vector<int> of scaled distance mobility track
-	 * @param sdsd vector<int> scaled distance std dev mobility track
-	 * @param sec vector<int> secondary structure mobility track
-	 * @param phis vector<int> phi angles mobility track
-	 * @param psis vector<int> psi angles mobility track
-	 * @param settings reference to MobiMethods object for mobi parameters
+	 * @param settings MobiMethods object with setted parameters
 	 * @return vector<int> of filtered mobility ("all" mobility)
 	 */
 	static vector<int> SDFilters(MobiMethods &settings){
@@ -157,48 +145,122 @@ public:
 				settings.getPsiMobility(), settings);
 	}
 
-
-
-	//static ProteinModel* averageModel(ProteinModel* protein, TMScoreBinder* tm);
+	/**
+	 * Get D0 value
+	 */
 	double getD0(){	return this->d0;}
 
+	/**
+	 * Get Atom used for distance calculation
+	 */
 	AtomCode getAtom(){return this->atom;}
 
+	/**
+	 * Get Average scale distance threshold
+	 */
 	double getSDTh(){return this->sd_th;}
 
+	/**
+	 * get Scaled distance deviance threshold
+	 */
 	double getSDSDTh(){return this->sdsd_th;}
 
+	/**
+	 * Get Phi angles deviation threshold
+	 */
 	double getPhiTh(){return this->phi_th;}
 
+	/**
+	 * Get Psi angles deviation threshold
+	 */
 	double getPsiTh(){return this->psi_th;}
 
-
+	/**
+	 * get average scaled distance
+	 */
 	const vector<double> getSDMeans(){return SDMeans;}
 
+	/**
+	 * get average scaled distance mobility track
+	 */
 	const vector<int> getSDMeanMobility(){return SDMeanMobility;}
 
+	/**
+	 * get scaled distance deviation vector
+	 */
 	const vector<double> getSDDevs(){return SDDevs;}
 
+	/**
+	 * get scaled distance deviation mobility track
+	 */
 	const vector<int> getSDDevsMobility(){return SDDevsMobility;}
 
+	/**
+	 * get psi angles deviations
+	 */
 	const vector<double> getPsisAngles(){return psisAngles;}
 
+	/**
+	 * get psi angles mobility track
+	 */
 	const vector<int> getPsiMobility(){return PsiMobility;}
 
+	/**
+	 * get phi angles deviations
+	 */
 	const vector<double> getPhisAngles(){return phisAngles;}
 
+	/**
+	 * get phi mobility track
+	 */
 	const vector<int> getPhiMobility(){return PhiMobility;}
 
+	/**
+	 * get secondary structure mobility
+	 */
 	const vector<int> getSecMobility(){return secMobility;}
 
+	/**
+	 * get mobi mobility "all" track
+	 */
 	const vector<int> getMobiMobility(){return mobiMob;}
 
+	/**
+	 * get sequence
+	 */
 	const vector<char> getSequence(){return sequence;}
 
-	VectorCollection& getDistances(){return dist;}
+	/**
+	 * get distance collection
+	 */
+	VectorCollection<double>& getDistances(){return dist;}
 
-	VectorCollection& getScaledDistances(){return scaledDist;}
+	/**
+	 * get scaled distance collection
+	 */
+	VectorCollection<double>& getScaledDistances(){return scaledDist;}
 
+
+protected:
+
+
+	/**
+	 * Calculate the "simple" distance given two models.
+	 * @param mod1 the first model (Spacer pointer)
+	 * @param mod2 the second model (Spacer pointer)
+	 * @param atom (AtomCode) atom to base distance calcutation on, default atom if not specified (CA)
+	 */
+	static vector<double> distance(Spacer* mod1, Spacer* mod2, AtomCode atom = DEF_ATOM);
+
+
+	/**
+	 * Calculate the scaled distance given two models
+	 * @param mod1 the first model (Spacer pointer)
+	 * @param mod2 the second model (Spacer pointer)
+	 * @param atom atom to base distance calculation on, default atom if not specified (CA)
+	 * @param d0  d0 normalization value, default value if not specified (4)
+	 */
+	static vector<double> scaledDistance(Spacer* mod1, Spacer* mod2, AtomCode atom = DEF_ATOM, double d0 = DEF_D0);
 
 private:
 	double d0;
@@ -221,8 +283,8 @@ private:
 	vector<int> secMobility;
 	vector<int> mobiMob;
 
-	VectorCollection scaledDist;	//Scaled distances
-	VectorCollection dist;			//"Simple" distances
+	VectorCollection<double> scaledDist;	//Scaled distances
+	VectorCollection<double> dist;			//"Simple" distances
 };
 
 }}	//Namespaces

@@ -17,7 +17,6 @@
  *  \author    Luca Demo
  *  \date      2015
  */
-
 #include <iostream>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestAssert.h>
@@ -27,26 +26,24 @@
 
 #include <Spacer.h>
 #include <PdbLoader.h>
-#include <PdbSaver.h>
-#include <TMScoreBin.h>
-#include <AminoAcid.h>
+#include <MobiProtein.h>
 
 using namespace std;
 using namespace Victor::Mobi;
 
-class TestTM : public CppUnit::TestFixture {
+class TestMobiProtein : public CppUnit::TestFixture {
 
 public:
 
-	TestTM(){}
+	TestMobiProtein(){}
 
-	virtual ~TestTM(){}
+	virtual ~TestMobiProtein(){}
 
 	static CppUnit::Test *suite() {
-	        CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("TestTM");
+	        CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("TestMobiProtein");
 
-	        suiteOfTests->addTest(new CppUnit::TestCaller<TestTM>("Test1 - TM Score",
-	                &TestTM::testLoadAndGet));
+	        suiteOfTests->addTest(new CppUnit::TestCaller<TestMobiProtein>("Test1 - Load and Get models",
+	                &TestMobiProtein::testLoadAndGet));
 
 	        return suiteOfTests;
 	    }
@@ -58,41 +55,27 @@ public:
 protected:
 
 	void testLoadAndGet(){
-		cout << endl << ">>>\tTestTM >>> test TM binary call" << endl;
+		cout << endl << ">>>\tTestMobiProtein >>> test Load and Get models" << endl;
 		string path = getenv("VICTOR_ROOT");
 		string inputFile = path + "Mobi/Tests/data/1AB2_input.pdb";
-		string TMDir = path + "Mobi/Tests/data/";
 		ifstream inFile(inputFile.c_str());
 		if (!inFile)
 			ERROR("Input file not found.", exception);
-		//models to load
-		vector<unsigned int> models = vector<unsigned int>();
-	    models.push_back(3);
-	    models.push_back(4);
 
-	    //loading models
 		PdbLoader pl(inFile);
-		pl.setNoVerbose();
-		MobiProtein prot;
+		//pl.setNoVerbose();
+	    MobiProtein prot = MobiProtein();
+	    vector<unsigned int> models = vector<unsigned int>();
+	    models.push_back(1);
+	    models.push_back(4);
+	    models.push_back(8);
 	    prot.load(pl,models);
-
-	    //calling TMScore bin
-	    TMScoreBin tmsb(TMDir+"TMScore", TMDir, false);
-	    MobiProtein* superImposed;
-	    tmsb.TMScore(prot,0,1,&superImposed);
-
-
-	    //save superimposed model to file
-	    std::ofstream fout;
-		PdbSaver ps(fout);
-		fout.open((TMDir + "superimposed_TM-Test.pdb").c_str());
-		ps.saveSpacer(*(superImposed->getModel(0)));
-		ps.endFile();
-		fout.close();
-
-		CPPUNIT_ASSERT(superImposed->getModel(0)->sizeAmino() == 109);
-		CPPUNIT_ASSERT(superImposed->getModel(0)->getAmino(0).getType() == "GLY");
+	    CPPUNIT_ASSERT(prot.size() == 3);
+	    Spacer* m1 = prot.getModel(0);
+	    Spacer* m2 = prot.getModel(1);
+	    Spacer* m3 = prot.getModel(2);
+	    CPPUNIT_ASSERT(m1->getAmino(0).getType() == "GLY");
+	    CPPUNIT_ASSERT(m2->getAmino(1).getType() == "SER");
+	    CPPUNIT_ASSERT(m3->getAmino(2).getType() == "GLY");
 	}
 };
-
-

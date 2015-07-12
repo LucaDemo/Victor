@@ -26,7 +26,7 @@ INC_PATH = -I. -I../../tools/ -I../../Biopool/Sources -I../../Mobi/Sources
 # Objects and headers
 #
 
-SOURCES =  TestMobi.cc TestVectorCollection.h TestProteinModel.h TestTM.h TestMobiMethods.h
+SOURCES =  TestMobi.cc TestVectorCollection.h TestMobiProtein.h TestTM.h TestMobiMethods.h
 
 OBJECTS =  $(SOURCES:.cpp=.o)
 

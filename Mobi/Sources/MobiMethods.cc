@@ -1,10 +1,22 @@
-/*
- * MobiMethods.cc
- *
- *  Created on: 09/giu/2015
- *      Author: luca
- */
+/*  This file is part of Victor.
 
+    Victor is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Victor is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Victor.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/*!
+ *  \author    Luca Demo
+ *  \date      2015
+ */
 #include <Atom.h>
 #include <Spacer.h>
 #include <PdbLoader.h>
@@ -35,19 +47,19 @@ void printVector(vector<T> const &v, string pre = ""){
 	cout << endl;
 }
 
-void MobiMethods::distances(ProteinModel* protein, TMScoreBinder* tm, VectorCollection& scaledDist, VectorCollection& dist, MobiMethods &mm){
+void MobiMethods::distances(MobiProtein* protein, TMScoreBinder* tm, VectorCollection<double>& scaledDist, VectorCollection<double>& dist, MobiMethods &mm){
 	scaledDist.clear();
 	dist.clear();
-	ProteinModel* imposed;
+	MobiProtein* imposed;
 	vector<double> tmpDist;
 	//Perform superimposition for every model pair
 	for (unsigned int i = 0; i < protein->size(); i++)
 		for (unsigned int j = i+1; j < protein->size(); j++){
 			tm->TMScore(*protein,i,j,&imposed);
 			tmpDist = scaledDistance(imposed->getModel(0),protein->getModel(j), mm.getAtom(), mm.getD0());
-			scaledDist.addValue((i*1000 + j), tmpDist);
+			scaledDist.addValue(i,j, tmpDist);
 			tmpDist = distance(imposed->getModel(0),protein->getModel(j), mm.getAtom());
-			dist.addValue((i*1000 + j), tmpDist);
+			dist.addValue(i,j, tmpDist);
 			delete imposed;
 		}
 }
@@ -79,13 +91,14 @@ vector<double> MobiMethods::scaledDistance(Spacer* mod1, Spacer* mod2, AtomCode 
 		Atom& refAtom = mod2->getAmino(i).getAtom(atom);
 
 		double dist = sqrt((mAtom.getCoords() - refAtom.getCoords()).square());
+		dist = mAtom.distance(refAtom);
 		sd[i] = 1/(1 + pow(dist / d0, 2.0));
 	}
 	return sd;
 }
 
 
-void MobiMethods::phis(ProteinModel* protein, VectorCollection& phis){
+void MobiMethods::phis(MobiProtein* protein, VectorCollection<double>& phis){
 	phis.clear();
 	vector<double> modelPhis(protein->getModel(0)->sizeAmino());
 	for (unsigned int i = 0; i < protein->size(); i++){
@@ -97,7 +110,7 @@ void MobiMethods::phis(ProteinModel* protein, VectorCollection& phis){
 	}
 }
 
-void MobiMethods::psis(ProteinModel* protein, VectorCollection& psis){
+void MobiMethods::psis(MobiProtein* protein, VectorCollection<double>& psis){
 	psis.clear();
 	vector<double> modelPsis(protein->getModel(0)->sizeAmino());
 	for (unsigned int i = 0; i < protein->size(); i++){
@@ -109,7 +122,7 @@ void MobiMethods::psis(ProteinModel* protein, VectorCollection& psis){
 	}
 }
 
-vector<int> MobiMethods::secondaryMobi(ProteinModel* protein){
+vector<int> MobiMethods::secondaryMobi(MobiProtein* protein){
 	//Check for errors in protein
 	unsigned int const protLen = protein->size();
 	if (protLen < 1)
@@ -156,7 +169,7 @@ vector<int> MobiMethods::secondaryMobi(ProteinModel* protein){
 
 
 
-vector<int> MobiMethods::mobiMobility(ProteinModel* protein, TMScoreBinder* tm){
+vector<int> MobiMethods::mobiMobility(MobiProtein* protein, TMScoreBinder* tm){
 	//Scaled Distances
     distances(protein,tm,scaledDist,dist,*this);
 
@@ -175,7 +188,7 @@ vector<int> MobiMethods::mobiMobility(ProteinModel* protein, TMScoreBinder* tm){
 	for (unsigned int i = 0; i < SDDevs.size(); i++)
 		SDDevsMobility[i] = SDDevs[i] > sdsd_th ? 1 : 0;
 
-	VectorCollection angles;
+	VectorCollection<double> angles;
 	//Psi angles
 	psis(protein,angles);	//values are cleared inside getPhis
 	psisAngles = angles.stdDev();

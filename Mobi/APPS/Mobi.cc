@@ -24,7 +24,7 @@
 #include <PdbSaver.h>
 #include <IoTools.h>
 #include <GetArg.h>
-#include <ProteinModel.h>
+#include <MobiProtein.h>
 #include <TMScoreBin.h>
 #include <MobiMethods.h>
 #include <MobiUtils.h>
@@ -46,6 +46,11 @@ void sShowHelp() {
 		<< "\t-c <id>       \t Chain identifier to read (default if first)\n"
 		<< "\t-m <number>   \t NMR models numbers to read, comma separated list (default is all) \n"
 		<< "\t-t	\t TMscore binary path (default is ./TMscore)\n"
+		<< "\t--d0 <number> 	\t d0 scaling factor for scaled distance. Default = 4"
+		<< "\t--sd <number>  \t threshold for Avg Scaled Distance track. Default = 0.85"
+		<< "\t--sdd <number> \t threshold for Scaled Distance Deviation track. Default = 0.09"
+		<< "\t--phi <number> \t threshold for phi angles track. Default = 20"
+		<< "\t--psi <number> \t threshold for psi angles track. Default = 20"
 		<< "\t-v	\t verbose output\n"
 		<< "\t-d	\t even more verbose output (lot of details)\n"
 		<< "\t-h	\t shows this message\n";
@@ -62,6 +67,7 @@ int main(int argc, char* argv[]) {
     }
 
     string inputFile, outputFile, outputPdb, tmbin, chainID, modelList;
+    string d0_s,sd_s,sdd_s,phi_s,psi_s;
     bool saveFasta = true, savePdb = true, verbose, debug;
     vector<unsigned int> models;
 
@@ -72,6 +78,11 @@ int main(int argc, char* argv[]) {
     getArg("t", tmbin, argc, argv, "!");
     getArg("c", chainID, argc, argv, "!");
     getArg("m", modelList, argc, argv, "!");
+    getArg("d0", d0_s, argc, argv, "!");
+    getArg("-sd", sd_s, argc, argv, "!");
+    getArg("-sdd", sdd_s, argc, argv, "!");
+    getArg("-psi", psi_s, argc, argv, "!");
+    getArg("-phi", phi_s, argc, argv, "!");
     verbose = getArg("v", argc, argv);
     debug = getArg("d", argc, argv);
 
@@ -84,9 +95,13 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     ifstream inFile(inputFile.c_str());
-    if (!inFile)
+    if (!inFile){
         ERROR("Input file not found.", exception);
-    // Check output file
+    }else{
+		if (verbose)
+			cout << "Using PDB input file: " << inputFile << endl;
+    }
+	// Check output file
     if (outputFile == "!") {
     	saveFasta = false;
     }
@@ -100,12 +115,35 @@ int main(int argc, char* argv[]) {
     }
     if(access(tmbin.c_str(), X_OK) != 0){
     	ERROR("TM binary (" + tmbin + ") does not exist or not executable.", exception);
+    }else{
+    	if (verbose)
+    		cout << "Using TMscore binary: " << tmbin << endl;
     }
 
+    //Check mobi parameters
+    double d0 = DEF_D0;
+    if (d0_s != "!")
+    	d0 = stodDEF(d0_s);
+    double sd_th = DEF_SD_TH;
+    if (sd_s != "!")
+    	sd_th = stodDEF(sd_s);
+    double sdsd_th = DEF_SDSD_TH;
+    if (sdd_s != "!")
+    	sdsd_th = stodDEF(sdd_s);
+    double phi_th = DEF_PHI_TH;
+    if (phi_s != "!")
+    	phi_th = stodDEF(phi_s);
+    double psi_th = DEF_PSI_TH;
+	if (psi_s != "!")
+		psi_th = stodDEF(psi_s);
 
+
+
+	cout << "pre loader" << endl;
 
     //MOBI
     PdbLoader pl(inFile);
+    cout << "ok" << endl;
     // Set PdbLoader variables
     if (!debug) {
         pl.setNoVerbose();
@@ -123,9 +161,13 @@ int main(int argc, char* argv[]) {
         	cout << "Selected chain: " << chainID[0] << endl;
     }// First chain
     else {
-        pl.setChain(pl.getAllChains()[0]);
-        if (verbose)
-        	cout << "Selected chain: " << pl.getAllChains()[0] << endl;
+        if (pl.getAllChains().size() > 0){
+			pl.setChain(pl.getAllChains()[0]);
+			if (verbose)
+				cout << "Selected chain: " << pl.getAllChains()[0] << endl;
+        }else
+        	if (verbose)
+        		cout << "No chains found." << endl;
     }
 
     // User selected models
@@ -146,7 +188,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Load the protein object
-    ProteinModel* prot = new ProteinModel();
+    MobiProtein* prot = new MobiProtein();
     if (debug)
     	prot->setVerbose(true);
     else
@@ -158,8 +200,8 @@ int main(int argc, char* argv[]) {
 
     // TMscore: here we use the external binary
     TMScoreBinder* tm = new TMScoreBin(tmbin,".");
-    // Default constructor for default thresholds
-    MobiMethods mm;
+    // Set MobiMethods Thresholds
+    MobiMethods mm(d0, CA, sd_th, sdsd_th, psi_th, phi_th);
     if (verbose)
     	mm.verbosity(1);	//Outputs tracks on cout
     if (debug)

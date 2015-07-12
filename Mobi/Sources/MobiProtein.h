@@ -1,4 +1,4 @@
-/* 	This file is part of Victor
+/*  This file is part of Victor.
 
     Victor is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -12,13 +12,10 @@
 
     You should have received a copy of the GNU General Public License
     along with Victor.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/**
- * @file PreteinModel.h
- * @author Luca Demo
- * @date May 2015
- * @version 0.1
+*/
+/*!
+ *  \author    Luca Demo
+ *  \date      2015
  */
 #ifndef MOBI_SOURCES_PROTEINMODEL_
 #define MOBI_SOURCES_PROTEINMODEL_
@@ -34,33 +31,26 @@ namespace Victor { namespace Mobi {
 	 * @brief Extends Protein class with functionalities related to manipulation of NMR model and models comparations.
 	 * Scale Distance metric is provided.
 	 */
-	class ProteinModel : public Protein{
+	class MobiProtein : public Protein{
 	public:
-		ProteinModel() : Protein(), verbose(false){modelsID = vector<unsigned int>(0);};
-		ProteinModel(const Protein& _orig) : Protein(_orig), verbose(false){};
-
-		ProteinModel* clone(){
-			ProteinModel* tmp = new ProteinModel();
-			tmp->copy(*this);
-			return tmp;
-		}
-
-		void copy(const ProteinModel& orig) {
-		    Protein::copy(orig);
-		}
-
+		MobiProtein() : Protein(), verbose(false){modelsID = vector<unsigned int>(0);};
 
 		vector<unsigned int> load(PdbLoader& pl, vector<unsigned int> models);
 		vector<unsigned int> load(PdbLoader& pl);
 
 		Spacer* getModel(unsigned int _model);
-		void SD(vector<double>& sd, ProteinModel& ref, AtomCode atom, double d0 = 4);
-		void SD(vector<double>& sd, Spacer* ref, AtomCode atom, double d0 = 4);
 
+		/**
+		 * Set verbosity to this class methods
+		 * @param v verbosity true/false
+		 */
 		void setVerbose(bool v){
 			verbose = v;
 		}
 
+		/**
+		 * Returns all original (as PDB) loaded modell ids
+		 */
 		const vector<unsigned int>& getModelsID(){ return modelsID;}
 
 	private:

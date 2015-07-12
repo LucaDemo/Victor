@@ -1665,7 +1665,9 @@ void Spacer::setDSSP(bool verbose) {
                 if (it != ss[i].end()) { // found a n-turn
                     char pos_s = *it;
                     int pos = atoi(&(pos_s));
-                    // ******************* PATCH FOR OUT OF BOUND SEG FAULT ****************** LUCA DEMO - MOBI
+                    // ******************* PATCH FOR OUT OF BOUND SEG FAULT ******************
+                    //LUCA DEMO - MOBI
+                    // ***********************************************************************
                     if ((i + pos - 1) >= ss.size())
                     	break;
                     set<char> ::iterator it1 = ss[i + pos - 1].find(turns[l]);

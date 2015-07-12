@@ -27,10 +27,10 @@ INC_PATH = -I. -I../../tools -I../../Biopool/Sources
 #
  
 
-SOURCES = 	 ProteinModel.cc TMScoreBin.cc MobiMethods.cc
+SOURCES = 	 MobiProtein.cc TMScoreBin.cc MobiMethods.cc
 
 
-OBJECTS = 	 ProteinModel.o  TMScoreBin.o MobiMethods.o
+OBJECTS = 	 MobiProtein.o  TMScoreBin.o MobiMethods.o
 
 
 TARGETS =   
