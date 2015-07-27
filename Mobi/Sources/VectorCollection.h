@@ -120,7 +120,7 @@ public:
 	 * Returns a list of all the model partecipating in this collection
 	 * @return (vector<int>) models
 	 */
-	vector<int> getModels(){
+	vector<int> getModels() const{
 		if (!safePairID)
 			cout << "[VectorCollection] getModels() Warning: vectors has been added with CUSTOM ids!";
 		vector<int> models;
@@ -138,7 +138,7 @@ public:
 	 * @param model (int) the model to search
 	 * @return (VectorCollection) subcollection relative to the model
 	 */
-	VectorCollection getValuesByModel(int model){
+	VectorCollection<V> getValuesByModel(int model) const{
 		if (!safePairID)
 			cout << "[VectorCollection] getValuesByModel() Warning: vectors has been added with CUSTOM ids!";
 		VectorCollection outVC;
@@ -158,7 +158,7 @@ public:
 	 * Returns the length of vectors in this collection
 	 * @return (unsigned int) length
 	 */
-	unsigned int vectorsSize(){
+	unsigned int vectorsSize() const{
 		if (size() < 1)
 			ERROR("Cannot get model lenght, since there are no models in this SDResult object",exception);
 		return this->results->begin()->second.size();
@@ -168,7 +168,7 @@ public:
 	 * Returns the size of this collection
 	 * @return (unsigned int) size
 	 */
-	unsigned int size(){
+	unsigned int size() const{
 		return this->results->size();
 	}
 
@@ -184,7 +184,7 @@ public:
 	 * Calculates the means of values in same position in the vectors
 	 * @return (vector<double>) means
 	 */
-	vector<V> mean(){
+	vector<V> mean() const{
 		vector<V> mean = vector<V>(this->vectorsSize(),0.0);
 		typename std::map<int,std::vector<V> >::const_iterator it;
 		for (it = this->results->begin(); it != this->results->end(); ++it)
@@ -199,7 +199,7 @@ public:
 	 * Calculates the standard deviation of values in same position in the vectors
 	 * @return (vector<double>) standard deviations
 	 */
-	vector<V> stdDev(){
+	vector<V> stdDev() const{
 		vector<V> mean = this->mean();
 		vector<V> sd = vector<V>(this->vectorsSize(),0.0);
 		typename std::map<int,std::vector<V> >::const_iterator it;
@@ -215,7 +215,7 @@ public:
 	 * Calculate rmsd for all distance records inside this VectorCollection and return their average
 	 * @return (double) mean rmsd
 	 */
-	V RMSD(){
+	V RMSD() const{
 		V rmsd = 0;
 		V singleRmsd;
 		typename std::map<int,std::vector<V> >::const_iterator it;
@@ -230,7 +230,7 @@ public:
 	}
 
 
-	vector<V> residueRMSD(){
+	vector<V> residueRMSD() const{
 		vector<V> rmsd(vectorsSize(),0);
 		for (typename std::map<int,std::vector<V> >::const_iterator it = this->results->begin();
 				it != this->results->end(); ++it)	//foreach distance record

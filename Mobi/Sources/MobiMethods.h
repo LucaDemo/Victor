@@ -41,7 +41,7 @@ extern const double DEF_SDSD_TH;
 extern const int DEF_VERBOSE;
 
 /**
- * This class provides methods to calculate Mobi mobility.\n
+ * This class provides methods to calculate mobility.\n
  * Can be instantiated to provide settings to the static methods and execute Mobi calculation.\n
  * Default constructor provides default mobi parameters.
  */
@@ -59,7 +59,7 @@ public:
 	 */
 	MobiMethods(double _d0 = DEF_D0, AtomCode _atom = DEF_ATOM, double _sd_th = DEF_SD_TH,
 			double _sdsd_th = DEF_SDSD_TH, double _psi_th = DEF_PSI_TH, double _phi_th = DEF_PHI_TH) :
-			 d0(_d0), atom(_atom), sd_th(_sd_th), sdsd_th(_sdsd_th), psi_th(_psi_th), phi_th(_phi_th), verbose(DEF_VERBOSE){}
+			 d0(_d0), atom(_atom), sd_th(_sd_th), sdsd_th(_sdsd_th), psi_th(_psi_th), phi_th(_phi_th), verbose(DEF_VERBOSE), done(false){}
 
 	/**
 	 * Set verbosity level
@@ -136,16 +136,6 @@ public:
 			vector<int> const &sec, vector<int> const &phis, vector<int> const &psis, MobiMethods &settings);
 
 	/**
-	 * Applies Mobi filters to Scaled Distance mobility track to obtain final mobility values
-	 * @param settings MobiMethods object with setted parameters
-	 * @return vector<int> of filtered mobility ("all" mobility)
-	 */
-	static vector<int> SDFilters(MobiMethods &settings){
-		return SDFilters(settings.getSDMeanMobility(), settings.getSDDevsMobility(), settings.getSecMobility(), settings.getPhiMobility(),
-				settings.getPsiMobility(), settings);
-	}
-
-	/**
 	 * Get D0 value
 	 */
 	double getD0(){	return this->d0;}
@@ -198,7 +188,7 @@ public:
 	/**
 	 * get psi angles deviations
 	 */
-	const vector<double> getPsisAngles(){return psisAngles;}
+	const vector<double> getPsiDevs(){return psiDev;}
 
 	/**
 	 * get psi angles mobility track
@@ -208,7 +198,7 @@ public:
 	/**
 	 * get phi angles deviations
 	 */
-	const vector<double> getPhisAngles(){return phisAngles;}
+	const vector<double> getPhiDevs(){return phiDev;}
 
 	/**
 	 * get phi mobility track
@@ -233,13 +223,31 @@ public:
 	/**
 	 * get distance collection
 	 */
-	VectorCollection<double>& getDistances(){return dist;}
+	const VectorCollection<double>& getDistances(){return dist;}
 
 	/**
 	 * get scaled distance collection
 	 */
-	VectorCollection<double>& getScaledDistances(){return scaledDist;}
+	const VectorCollection<double>& getScaledDistances(){return scaledDist;}
 
+
+	/**
+	 * get phi angles
+	 */
+	const VectorCollection<double>& getPhiAngles(){return phiAngles;}
+
+	/**
+	 * get psi angles
+	 */
+	const VectorCollection<double>& getPsiAngles(){return psiAngles;}
+
+	/**
+	 * Return true if mobi calculation has been performed in this object.
+	 * @return true if mobi mobility is calculated, false otherwise
+	 */
+	bool isDone(){
+		return done;
+	}
 
 protected:
 
@@ -263,6 +271,20 @@ protected:
 	static vector<double> scaledDistance(Spacer* mod1, Spacer* mod2, AtomCode atom = DEF_ATOM, double d0 = DEF_D0);
 
 private:
+
+	/**
+	 * Applies Mobi filters to Scaled Distance mobility track to obtain final mobility values.
+	 * Private method as shortcut in mobiMobility method.
+	 * @return vector<int> of filtered mobility ("all" mobility)
+	 */
+	vector<int> SDFilters(){
+		return SDFilters(getSDMeanMobility(), getSDDevsMobility(), getSecMobility(), getPhiMobility(),
+				getPsiMobility(), *this);
+	}
+
+
+
+
 	double d0;
 	double sdsd_th;
 	double sd_th;
@@ -276,15 +298,19 @@ private:
 	vector<int> SDMeanMobility;
 	vector<double> SDDevs;
 	vector<int> SDDevsMobility;
-	vector<double> psisAngles;
+	vector<double> psiDev;
 	vector<int> PsiMobility;
-	vector<double> phisAngles;
+	vector<double> phiDev;
 	vector<int> PhiMobility;
 	vector<int> secMobility;
 	vector<int> mobiMob;
 
 	VectorCollection<double> scaledDist;	//Scaled distances
 	VectorCollection<double> dist;			//"Simple" distances
+	VectorCollection<double> phiAngles;
+	VectorCollection<double> psiAngles;
+
+	bool done;
 };
 
 }}	//Namespaces

@@ -154,9 +154,11 @@ int main(int argc, char* argv[]) {
 			pl.setChain(pl.getAllChains()[0]);
 			if (verbose)
 				cout << "Selected chain: " << pl.getAllChains()[0] << endl;
+			chainID = pl.getAllChains()[0];
         }else
         	if (verbose)
-        		cout << "No chains found." << endl;
+        		ERROR("No chains found. Quit...", exception);
+
     }
 
     // User selected models
@@ -221,10 +223,8 @@ int main(int argc, char* argv[]) {
 	}
 
 
-	cout << endl << endl;
-	vector<double> rmsd = mm.getDistances().residueRMSD();
-	for (unsigned int i = 0; i < rmsd.size(); i++)
-		cout << rmsd[i]/1.075 << endl;
+	ofstream scoreOut("score.txt");
+	MobiUtils::saveScore(mm,chainID[0],scoreOut);
 	//Close
 	tm->cleanup();
 	delete prot;

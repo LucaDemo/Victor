@@ -170,6 +170,7 @@ vector<int> MobiMethods::secondaryMobi(MobiProtein* protein){
 
 
 vector<int> MobiMethods::mobiMobility(MobiProtein* protein, TMScoreBinder* tm){
+	done = false;
 	//Scaled Distances
     distances(protein,tm,scaledDist,dist,*this);
 
@@ -188,27 +189,28 @@ vector<int> MobiMethods::mobiMobility(MobiProtein* protein, TMScoreBinder* tm){
 	for (unsigned int i = 0; i < SDDevs.size(); i++)
 		SDDevsMobility[i] = SDDevs[i] > sdsd_th ? 1 : 0;
 
-	VectorCollection<double> angles;
 	//Psi angles
-	psis(protein,angles);	//values are cleared inside getPhis
-	psisAngles = angles.stdDev();
-	PsiMobility = vector<int>(psisAngles.size());
-	for (unsigned int i = 0; i < psisAngles.size(); i++)
-		PsiMobility[i] = psisAngles[i] > psi_th ? 1 : 0;
+	psis(protein,psiAngles);	//values are cleared inside getPhis
+	psiDev = psiAngles.stdDev();
+	PsiMobility = vector<int>(psiDev.size());
+	for (unsigned int i = 0; i < psiDev.size(); i++)
+		PsiMobility[i] = psiDev[i] > psi_th ? 1 : 0;
 	//Phi angles
-	phis(protein,angles);	//values are cleared inside getPhis
-	phisAngles = angles.stdDev();
-	PhiMobility = vector<int>(phisAngles.size());
-	for (unsigned int i = 0; i < phisAngles.size(); i++)
-		PhiMobility[i] = phisAngles[i] > phi_th ? 1 : 0;
+	phis(protein,phiAngles);	//values are cleared inside getPhis
+	phiDev = phiAngles.stdDev();
+	PhiMobility = vector<int>(phiDev.size());
+	for (unsigned int i = 0; i < phiDev.size(); i++)
+		PhiMobility[i] = phiDev[i] > phi_th ? 1 : 0;
 	//Secondary mobility
 	secMobility = secondaryMobi(protein);
 
 	//Calculate Mobi Mobility
-	mobiMob = SDFilters(SDMeanMobility, SDDevsMobility, secMobility, PhiMobility, PsiMobility, *this);
+	mobiMob = SDFilters();
 
+	done = true;
 	return mobiMob;
 }
+
 
 vector<int> MobiMethods::SDFilters(vector<int> const &sd, vector<int> const &sdsd,
 		vector<int> const &dssp, vector<int> const &phis, vector<int> const &psis, MobiMethods &mm){
