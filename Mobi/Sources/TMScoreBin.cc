@@ -37,6 +37,9 @@ using namespace Victor::Biopool;
 using namespace std;
 
 
+const string TMTMP_IN1 = "tmin1.pdb.tmp";
+const string TMTMP_IN2 = "tmin2.pdb.tmp";
+const string TMTMP_OUT = "tmout.pdb.tmp";
 
 /**
  * @brief the TMScore output is not pdb conformant. This static method read the output and fix it in a memory buffer.
@@ -48,8 +51,7 @@ void spacerFromTMOutput(string pdbFile, MobiProtein** imposedModel);
 
 
 double TMScoreBin::TMScore(MobiProtein& prot1, unsigned int model1, MobiProtein& prot2, unsigned int model2, MobiProtein** imposedModel){
-	string TMTMP_IN1 = "tmin1.pdb.tmp";		//Decided to not use global const
-	string TMTMP_IN2 = "tmin2.pdb.tmp";		//Decided to not use global const
+
 
 	if (verbose)
 		cout << "TMScore between models " << model1 << " and " << model2;
@@ -74,7 +76,7 @@ double TMScoreBin::TMScore(MobiProtein& prot, unsigned int model1, unsigned int 
 }
 
 double TMScoreBin::TMScore(string model1, string model2, MobiProtein** imposedModel){
-	string TMTMP_OUT = "tmout.pdb.tmp";		//Decided to not use global const
+
 	double score = -1;
 	if (access(model1.c_str(), R_OK) == 0 && access(model2.c_str(), R_OK) == 0){
 		if(access(binary.c_str(), X_OK) == 0){
@@ -156,5 +158,18 @@ void spacerFromTMOutput(string pdbFile, MobiProtein** imposedModel){
 	pl.setModel(1);
 	cout.flush();
 	pl.loadProtein(**imposedModel);
+}
+
+void TMScoreBin::cleanup(){
+	if(remove(TMTMP_IN1.c_str()) != 0)
+		cout << "Error deleting file " << TMTMP_IN1 << endl;
+	if(remove(TMTMP_IN2.c_str()) != 0)
+		cout << "Error deleting file " << TMTMP_IN2 << endl;
+	if(remove(TMTMP_OUT.c_str()) != 0)
+		cout << "Error deleting file " << TMTMP_OUT << endl;
+	if(remove((TMTMP_OUT + "_atm").c_str()) != 0)
+		cout << "Error deleting file " << TMTMP_OUT + "_atm" << endl;
+	if (verbose)
+		cout << "TM temporary files deleted" << endl;
 }
 

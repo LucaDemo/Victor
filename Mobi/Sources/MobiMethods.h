@@ -41,7 +41,7 @@ extern const double DEF_SDSD_TH;
 extern const int DEF_VERBOSE;
 
 /**
- * This class provides methods to calculate mobility.\n
+ * This class provides methods to calculate Mobi mobility.\n
  * Can be instantiated to provide settings to the static methods and execute Mobi calculation.\n
  * Default constructor provides default mobi parameters.
  */

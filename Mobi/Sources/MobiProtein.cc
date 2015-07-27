@@ -24,14 +24,7 @@ using namespace Victor;
 using namespace Victor::Mobi;
 using namespace Victor::Biopool;
 
-/**
- * Load Pdb data into Protein object. The specified models are loaded.
- * There is no direct correlation between models id in pdb file and model
- * index inside protein object. Index inside protein depends on the order
- * in which the models are loaded. *
- * @param pl (PdbLoader&) reference to the PdbLoader to load from
- * @param models (vector<unsigned int>) models to load (accordind to pdb file model names),
- */
+
 vector<unsigned int> MobiProtein::load(PdbLoader& pl, vector<unsigned int> models){
 	if (verbose)
 		cout << "Loading protein models..." <<endl;
@@ -51,13 +44,7 @@ vector<unsigned int> MobiProtein::load(PdbLoader& pl, vector<unsigned int> model
 	return models;
 }
 
-/**
- * Load Pdb data into Protein object. All models are loaded.
- * There is no direct correlation between models id in pdb file and model
- * index inside protein object. Index inside protein depends on the order
- * in which the models are loaded. *
- * @param pl (PdbLoader&) reference to the PdbLoader to load from
- */
+
 vector<unsigned int> MobiProtein::load(PdbLoader& pl){
 	vector<unsigned int> models;
 	//Load Models
@@ -66,11 +53,6 @@ vector<unsigned int> MobiProtein::load(PdbLoader& pl){
 	return load(pl,models);
 }
 
-/**
- * Get the Spacer object representing the model of this Protein
- * @param model (unsigned int) the model to get
- * @return (Spacer&) the model
- */
 Spacer* MobiProtein::getModel(unsigned int model){
 	return this->getSpacer(model);
 }

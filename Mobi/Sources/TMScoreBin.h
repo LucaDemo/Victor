@@ -31,9 +31,9 @@ using namespace Victor::Mobi;
 using namespace std;
 
 
-//extern const std::string TMTMP_IN1;
-//extern const std::string TMTMP_IN2;
-//extern const std::string TMTMP_OUT;
+extern const std::string TMTMP_IN1;
+extern const std::string TMTMP_IN2;
+extern const std::string TMTMP_OUT;
 
 
 
@@ -100,6 +100,11 @@ namespace Victor { namespace Mobi {
 		void setVerbose(bool v){
 			verbose = v;
 		}
+
+		/**
+		 * Cleans temporary files
+		 */
+		void cleanup();
 
 		/**
 		 * Default deconstructor

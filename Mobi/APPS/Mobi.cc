@@ -40,17 +40,18 @@ void sShowHelp() {
 	cout << "Victor - Mobi NMR Mobility: 1.0\n"
 		<< "Mobility defined accordingly with http://protein.bio.unipd.it/mobi/"
 		<< "Options: \n"
-		<< "\t-i <filename> \t Input PDB file\n"
+		<< "\t-i <filename> \t Input PDB file (mandatory)\n"
 		<< "\t-o <filename> \t Output mobility tracks to FASTA file (default stdout)\n"
 		<< "\t-p <filename> \t Output ordered models in PDB file (default is no output)\n"
-		<< "\t-c <id>       \t Chain identifier to read (default if first)\n"
-		<< "\t-m <number>   \t NMR models numbers to read, comma separated list (default is all) \n"
+		<< "\t-s <filename> \t Output residue mobility \"score\" (default is no output)\n"
+		<< "\t-c <id>       \t Chain identifier to read (default if first chain)\n"
+		<< "\t-m <number>   \t NMR models numbers to read, comma separated list (default is all models)\n"
 		<< "\t-t	\t TMscore binary path (default is ./TMscore)\n"
-		<< "\t--d0 <number> 	\t d0 scaling factor for scaled distance. Default = 4"
-		<< "\t--sd <number>  \t threshold for Avg Scaled Distance track. Default = 0.85"
-		<< "\t--sdd <number> \t threshold for Scaled Distance Deviation track. Default = 0.09"
-		<< "\t--phi <number> \t threshold for phi angles track. Default = 20"
-		<< "\t--psi <number> \t threshold for psi angles track. Default = 20"
+		<< "\t--d0 <number> \t d0 scaling factor for scaled distance. Default = 4\n"
+		<< "\t--sd <number>  \t threshold for Avg Scaled Distance track. Default = 0.85\n"
+		<< "\t--sdd <number> \t threshold for Scaled Distance Deviation track. Default = 0.09\n"
+		<< "\t--phi <number> \t threshold for phi angles track. Default = 20\n"
+		<< "\t--psi <number> \t threshold for psi angles track. Default = 20\n"
 		<< "\t-v	\t verbose output\n"
 		<< "\t-d	\t even more verbose output (lot of details)\n"
 		<< "\t-h	\t shows this message\n";
@@ -66,19 +67,20 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    string inputFile, outputFile, outputPdb, tmbin, chainID, modelList;
+    string inputFile, outputFile, outputPdb, outputScore, tmbin, chainID, modelList;
     string d0_s,sd_s,sdd_s,phi_s,psi_s;
-    bool saveFasta = true, savePdb = true, verbose, debug;
+    bool verbose, debug;
     vector<unsigned int> models;
 
 
     getArg("i", inputFile, argc, argv, "!");
     getArg("o", outputFile, argc, argv, "!");
     getArg("p", outputPdb, argc, argv, "!");
+    getArg("s", outputScore, argc, argv, "!");
     getArg("t", tmbin, argc, argv, "!");
     getArg("c", chainID, argc, argv, "!");
     getArg("m", modelList, argc, argv, "!");
-    getArg("d0", d0_s, argc, argv, "!");
+    getArg("-d0", d0_s, argc, argv, "!");
     getArg("-sd", sd_s, argc, argv, "!");
     getArg("-sdd", sdd_s, argc, argv, "!");
     getArg("-psi", psi_s, argc, argv, "!");
@@ -100,14 +102,6 @@ int main(int argc, char* argv[]) {
     }else{
 		if (verbose)
 			cout << "Using PDB input file: " << inputFile << endl;
-    }
-	// Check output file
-    if (outputFile == "!") {
-    	saveFasta = false;
-    }
-    // Check output pdb
-    if (outputPdb == "!") {
-    	savePdb = false;
     }
     // check TM
     if (tmbin == "!") {
@@ -137,13 +131,8 @@ int main(int argc, char* argv[]) {
 	if (psi_s != "!")
 		psi_th = stodDEF(psi_s);
 
-
-
-	cout << "pre loader" << endl;
-
     //MOBI
     PdbLoader pl(inFile);
-    cout << "ok" << endl;
     // Set PdbLoader variables
     if (!debug) {
         pl.setNoVerbose();
@@ -199,7 +188,7 @@ int main(int argc, char* argv[]) {
     cout << endl;
 
     // TMscore: here we use the external binary
-    TMScoreBinder* tm = new TMScoreBin(tmbin,".");
+    TMScoreBin* tm = new TMScoreBin(tmbin,".");
     // Set MobiMethods Thresholds
     MobiMethods mm(d0, CA, sd_th, sdsd_th, psi_th, phi_th);
     if (verbose)
@@ -215,7 +204,7 @@ int main(int argc, char* argv[]) {
 		MobiUtils::printFastaFile(mm);
 		cout << endl;
 	}
-	if (saveFasta){	//save fasta
+	if (outputFile != "!"){	//save fasta
 		ofstream fastaOut(outputFile.c_str());
 		MobiUtils::printFastaFile(mm,fastaOut);
 		fastaOut.close();
@@ -223,7 +212,7 @@ int main(int argc, char* argv[]) {
 			cout << "Tracks saved in FASTA file: " << outputFile << endl;
 	}
 
-	if (savePdb){	//save Pdb
+	if (outputPdb != "!"){	//save Pdb
 		ofstream pdbOut(outputPdb.c_str());
 		MobiUtils::saveMobiPdb(prot,MobiUtils::sortModels(mm.getDistances()),mm.getSDMeans(), mm.getSDDevs(),pdbOut);
 		pdbOut.close();
@@ -231,7 +220,13 @@ int main(int argc, char* argv[]) {
 			cout << "Models saved in Pdb file: " << outputPdb << endl;
 	}
 
+
+	cout << endl << endl;
+	vector<double> rmsd = mm.getDistances().residueRMSD();
+	for (unsigned int i = 0; i < rmsd.size(); i++)
+		cout << rmsd[i]/1.075 << endl;
 	//Close
+	tm->cleanup();
 	delete prot;
 	delete tm;
 

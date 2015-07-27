@@ -184,7 +184,7 @@ public:
 	 * Calculates the means of values in same position in the vectors
 	 * @return (vector<double>) means
 	 */
-	vector<double> mean(){
+	vector<V> mean(){
 		vector<V> mean = vector<V>(this->vectorsSize(),0.0);
 		typename std::map<int,std::vector<V> >::const_iterator it;
 		for (it = this->results->begin(); it != this->results->end(); ++it)
@@ -215,7 +215,7 @@ public:
 	 * Calculate rmsd for all distance records inside this VectorCollection and return their average
 	 * @return (double) mean rmsd
 	 */
-	double rmsd(){
+	V RMSD(){
 		V rmsd = 0;
 		V singleRmsd;
 		typename std::map<int,std::vector<V> >::const_iterator it;
@@ -227,6 +227,22 @@ public:
 			rmsd += singleRmsd;
 		}
 		return (rmsd / results->size());
+	}
+
+
+	vector<V> residueRMSD(){
+		vector<V> rmsd(vectorsSize(),0);
+		for (typename std::map<int,std::vector<V> >::const_iterator it = this->results->begin();
+				it != this->results->end(); ++it)	//foreach distance record
+			for (unsigned int i = 0; i < this->vectorsSize(); i++){	//foreach residue
+				rmsd[i] += (pow(it->second[i],2) / size());	//cumulate the 2pow of distance
+//				if (i == 0)
+//					cout << ">>>" << it->second[i] << endl;
+			}
+		for (unsigned int i = 0; i < rmsd.size(); i++)
+			rmsd[i] = sqrt(rmsd[i]);
+
+		return rmsd;
 	}
 
 	/**

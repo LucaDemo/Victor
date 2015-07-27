@@ -29,15 +29,35 @@ using namespace Victor::Biopool;
 namespace Victor { namespace Mobi {
 	/**
 	 * @brief Extends Protein class with functionalities related to manipulation of NMR model and models comparations.
-	 * Scale Distance metric is provided.
 	 */
 	class MobiProtein : public Protein{
 	public:
 		MobiProtein() : Protein(), verbose(false){modelsID = vector<unsigned int>(0);};
 
+		/**
+		 * Load Pdb data into Protein object. The specified models are loaded.
+		 * There is no direct relation between models id in pdb file and model
+		 * index inside protein object. Index inside protein depends on the order
+		 * in which the models are loaded.
+		 * @param pl reference to the PdbLoader to load from
+		 * @param models models to load (accordind to pdb file model names), vector<unsigned int>
+		 */
 		vector<unsigned int> load(PdbLoader& pl, vector<unsigned int> models);
+
+		/**
+		 * Load Pdb data into Protein object. All models are loaded.
+		 * There is no direct relation between models id in pdb file and model
+		 * index inside protein object. Index inside protein depends on the order
+		 * in which the models are loaded.
+		 * @param pl (PdbLoader&) reference to the PdbLoader to load from
+		 */
 		vector<unsigned int> load(PdbLoader& pl);
 
+		/**
+		 * Get the specified model in this Protein.
+		 * @param model (unsigned int) the model internal id (not original Pdb model name) to get
+		 * @return (Spacer&) the model
+		 */
 		Spacer* getModel(unsigned int _model);
 
 		/**
@@ -49,7 +69,8 @@ namespace Victor { namespace Mobi {
 		}
 
 		/**
-		 * Returns all original (as PDB) loaded modell ids
+		 * Returns all original (as PDB) loaded modell ids.
+		 * @return vector containing original Pdb ids of loaded models. Vector index matches internal id.
 		 */
 		const vector<unsigned int>& getModelsID(){ return modelsID;}
 
