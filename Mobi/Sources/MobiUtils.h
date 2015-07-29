@@ -222,8 +222,8 @@ public:
 	 * "Write residues" and "write secondary" options are ignored.
 	 *@param prot pointer to protein containing models
 	 *@param order vector<int> ordered models IDs
-	 *@param dist average scaled distance vector for this protein's models
-	 *@param dev scaled distance standard deviation vector for this protein's models
+	 *@param avgDist average scaled distance vector for this protein's models
+	 *@param distDev scaled distance standard deviation vector for this protein's models
 	 *@param output output stream
 	 *@return void
 	 */

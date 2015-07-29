@@ -44,7 +44,7 @@ void sShowHelp() {
 		<< "\t-o <filename> \t Output mobility tracks to FASTA file (default stdout)\n"
 		<< "\t-p <filename> \t Output ordered models in PDB file (default is no output)\n"
 		<< "\t-s <filename> \t Output residue mobility \"score\" (default is no output)\n"
-		<< "\t-c <id>       \t Chain identifier to read (default if first chain)\n"
+		<< "\t-c <id>       \t Chain identifier to read (default is first chain)\n"
 		<< "\t-m <number>   \t NMR models numbers to read, comma separated list (default is all models)\n"
 		<< "\t-t	\t TMscore binary path (default is ./TMscore)\n"
 		<< "\t--d0 <number> \t d0 scaling factor for scaled distance. Default = 4\n"
@@ -222,9 +222,16 @@ int main(int argc, char* argv[]) {
 			cout << "Models saved in Pdb file: " << outputPdb << endl;
 	}
 
+	if (outputScore != "!"){	//Save Score
+		ofstream scoreOut(outputScore.c_str());
+		MobiUtils::saveScore(mm,chainID[0],scoreOut);
+		scoreOut.close();
+		if (verbose)
+			cout << "Score saved in file: " << outputScore << endl;
+	}
 
-	ofstream scoreOut("score.txt");
-	MobiUtils::saveScore(mm,chainID[0],scoreOut);
+
+
 	//Close
 	tm->cleanup();
 	delete prot;

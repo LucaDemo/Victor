@@ -134,9 +134,11 @@ vector<int> MobiMethods::secondaryMobi(MobiProtein* protein){
 
 	//Build DSSP matrix for this protein
 	//1st index = Rows = models; 2nd index = Columns = Residues
-	char protDSSP[protLen][modLen];
+	vector<vector<char> > protDSSP(protLen);
+	//char protDSSP[protLen][modLen];		//not ISO C++
 	for (unsigned int i = 0; i < protLen; i++){	//foreach i model
 		//get DSSP for i-model
+		protDSSP[i] = vector<char>(modLen,0);
 		vector<set<char> > modelDSSP = protein->getModel(i)->getDSSP();
 		if (modelDSSP.size() != modLen)
 			ERROR("DSSP length differs from expected",exception);

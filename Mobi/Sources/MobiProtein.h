@@ -58,7 +58,7 @@ namespace Victor { namespace Mobi {
 		 * @param model (unsigned int) the model internal id (not original Pdb model name) to get
 		 * @return (Spacer&) the model
 		 */
-		Spacer* getModel(unsigned int _model);
+		Spacer* getModel(unsigned int model);
 
 		/**
 		 * Set verbosity to this class methods
