@@ -188,15 +188,14 @@ vector<int> MobiMethods::mobiMobility(MobiProtein* protein, TMScoreBinder* tm){
     SDDevsMobility = vector<int>(SDDevs.size());
 	for (unsigned int i = 0; i < SDDevs.size(); i++)
 		SDDevsMobility[i] = SDDevs[i] > sdsd_th ? 1 : 0;
-
 	//Psi angles
-	psis(protein,psiAngles);	//values are cleared inside getPhis
+	psis(protein,psiAngles);
 	psiDev = psiAngles.stdDev();
 	PsiMobility = vector<int>(psiDev.size());
 	for (unsigned int i = 0; i < psiDev.size(); i++)
 		PsiMobility[i] = psiDev[i] > psi_th ? 1 : 0;
 	//Phi angles
-	phis(protein,phiAngles);	//values are cleared inside getPhis
+	phis(protein,phiAngles);
 	phiDev = phiAngles.stdDev();
 	PhiMobility = vector<int>(phiDev.size());
 	for (unsigned int i = 0; i < phiDev.size(); i++)
@@ -206,6 +205,7 @@ vector<int> MobiMethods::mobiMobility(MobiProtein* protein, TMScoreBinder* tm){
 
 	//Calculate Mobi Mobility
 	mobiMob = SDFilters();
+
 
 	done = true;
 	return mobiMob;
@@ -226,67 +226,67 @@ vector<int> MobiMethods::SDFilters(vector<int> const &sd, vector<int> const &sds
 
 	//Patterns in SD
 	//1011 -> 1111
-	for (unsigned int i = 1; i < sdm.size() - 2; i++)
-		if (sdm[i] == 0 && sdm[i-1] == 1 && sdm[i+1] == 1 && sdm[i+2] == 1){
-			sdm[i] = 1;
-			i+=2;
+	for (unsigned int i = 0; i < sdm.size() - 3; i++)
+		if (sdm[i] == 1 && sdm[i+1] == 0 && sdm[i+2] == 1 && sdm[i+3] == 1){
+			sdm[i+1] = 1;
+			i+=2; //jump to next possible pattern (+3 considering ++ of for cycle)
 			if (mm.verbosity() > 1)
 				printVector(sdm, "1011->1111");
 		}
 	//1101 -> 1111
-	for (unsigned int i = 2; i < sdm.size() - 1; i++)
-		if (sdm[i] == 0 && sdm[i-1] == 1 && sdm[i-2] == 1 && sdm[i+1] == 1){
-			sdm[i] = 1;
-			i+=1;
+	for (unsigned int i = 0; i < sdm.size() - 3; i++)
+		if (sdm[i] == 1 && sdm[i+1] == 1 && sdm[i+2] == 0 && sdm[i+3] == 1){
+			sdm[i+2] = 1;
+			i+=2; //jump to next possible pattern (+3 considering ++ of for cycle)
 			if (mm.verbosity() > 1)
 				printVector(sdm, "1101->1111");
 		}
 	//10011 -> 11111
-	for (unsigned int i = 1; i < sdm.size() - 3; i++)
-		if (sdm[i] == 0 && sdm[i+1] == 0 && sdm[i-1] == 1 && sdm[i+2] == 1 && sdm[i+3] == 1){
-			sdm[i] = 1;
+	for (unsigned int i = 1; i < sdm.size() - 4; i++)
+		if (sdm[i] == 1 && sdm[i+1] == 0 && sdm[i+2] == 0 && sdm[i+3] == 1 && sdm[i+4] == 1){
 			sdm[i+1] = 1;
-			i+=3;
+			sdm[i+2] = 1;
+			i+=3; //jump to next possible pattern (+4 considering ++ of for cycle)
 			if (mm.verbosity() > 1)
 				printVector(sdm,"10011->11111");
 		}
 	//11001 -> 11111
-	for (unsigned int i = 2; i < sdm.size() -2; i++)
-		if (sdm[i] == 0 && sdm[i+1] == 0 && sdm[i-1] == 1 && sdm[i-2] == 1 && sdm[i+2] == 1){
-			sdm[i] = 1;
-			sdm[i+1] = 1;
-			i+=2;
+	for (unsigned int i = 1; i < sdm.size() - 4; i++)
+		if (sdm[i] == 1 && sdm[i+1] == 1 && sdm[i+2] == 0 && sdm[i+3] == 0 && sdm[i+4] == 1){
+			sdm[i+2] = 1;
+			sdm[i+3] = 1;
+			i+=3; //jump to next possible pattern (+4 considering ++ of for cycle)
 			if (mm.verbosity() > 1)
-				printVector(sdm,"11001->11111");
+				printVector(sdm,"10011->11111");
 		}
 	//01010 -> 00000
-	for (unsigned int i = 0; i < sdm.size() - 4; i++)
+	for (unsigned int i = 1; i < sdm.size() - 4; i++)
 		if (sdm[i] == 0 && sdm[i+1] == 1 && sdm[i+2] == 0 && sdm[i+3] == 1 && sdm[i+4] == 0){
 			sdm[i+1] = 0;
 			sdm[i+3] = 0;
-			i+=3;
+			i+=3; //jump to next possible pattern (+4 considering ++ of for cycle)
 			if (mm.verbosity() > 1)
-				printVector(sdm,"01010->00000");
+				printVector(sdm,"10011->11111");
 		}
 	//00100 -> 00000
-	for (unsigned int i = 2; i < sdm.size() - 2; i++)
-		if (sdm[i] == 1 && sdm[i+1] == 0 && sdm[i+2] == 0 && sdm[i-1] == 0 && sdm[i-2] == 0){
-			sdm[i] = 0;
-			i+=2;
+	for (unsigned int i = 1; i < sdm.size() - 4; i++)
+		if (sdm[i] == 0 && sdm[i+1] == 0 && sdm[i+2] == 1 && sdm[i+3] == 0 && sdm[i+4] == 0){
+			sdm[i+2] = 0;
+			i+=2; //jump to next possible pattern (+3 considering ++ of for cycle)
 			if (mm.verbosity() > 1)
-				printVector(sdm,"00100->00000");
+				printVector(sdm,"10011->11111");
 		}
 	//001100 -> 000000
-	for (unsigned int i = 2; i < sdm.size() - 3; i++)
-		if (sdm[i] == 1 && sdm[i+1] == 1 && sdm[i-1] == 0 && sdm[i-2] == 0 && sdm[i+2] == 0 && sdm[i+3] == 0){
-			sdm[i] = 0;
-			sdm[i+1] = 0;
-			i+=3;
+	for (unsigned int i = 1; i < sdm.size() - 5; i++)
+		if (sdm[i] == 0 && sdm[i+1] == 0 && sdm[i+2] == 1 && sdm[i+3] == 1 && sdm[i+4] == 0 && sdm[i+5] == 0){
+			sdm[i+2] = 0;
+			sdm[i+3] = 0;
+			i+=3; //jump to next possible pattern (+4 considering ++ of for cycle)
 			if (mm.verbosity() > 1)
-				printVector(sdm,"001100->000000");
+				printVector(sdm,"10011->11111");
 		}
 
-	//Other patterns
+	//Final patterns
 	//110->111
 	for (unsigned int i = 0; i < sdm.size() - 2; i++)
 		if (sdm[i] == 1 && sdm[i+1] == 1 && sdm[i+2] == 0)
@@ -294,6 +294,7 @@ vector<int> MobiMethods::SDFilters(vector<int> const &sd, vector<int> const &sds
 				sdm[i+2] = 1;
 				if (mm.verbosity() > 1)
 					printVector(sdm, "110->111");
+				i += 2; //jump to next possible pattern (+3 considering ++ of for cycle)
 			}
 	//011->111
 	for (unsigned int i = 0; i < sdm.size() - 2; i++)
@@ -302,6 +303,7 @@ vector<int> MobiMethods::SDFilters(vector<int> const &sd, vector<int> const &sds
 				sdm[i] = 1;
 				if (mm.verbosity() > 1)
 					printVector(sdm, "011->111");
+				i += 2; //jump to next possible pattern (+3 considering ++ of for cycle)
 			}
 
 	return sdm;
