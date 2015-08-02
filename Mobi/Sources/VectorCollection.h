@@ -230,7 +230,7 @@ public:
 	}
 
 
-	vector<V> residueRMSD() const{
+	vector<V> mobilityIndex() const{
 		vector<V> rmsd(vectorsSize(),0);
 		for (typename std::map<int,std::vector<V> >::const_iterator it = this->results->begin();
 				it != this->results->end(); ++it)	//foreach distance record

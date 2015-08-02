@@ -77,5 +77,7 @@ protected:
 	    CPPUNIT_ASSERT(m1->getAmino(0).getType() == "GLY");
 	    CPPUNIT_ASSERT(m2->getAmino(1).getType() == "SER");
 	    CPPUNIT_ASSERT(m3->getAmino(2).getType() == "GLY");
+	    Spacer* m4 = prot.getModelByPdbID(8);
+	    CPPUNIT_ASSERT(m4 == m3);
 	}
 };

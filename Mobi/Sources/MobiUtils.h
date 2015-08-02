@@ -78,41 +78,7 @@ public:
 	}
 
 
-	/**
-	 * Calculate the rmsd distance given two spacers.
-	 * @param mod1 reference to first model (Spacer)
-	 * @param mod2 reference to second model (Spacer)
-	 * @param atom atom to base distance calcutation on, default atom if not specified (CA)
-	 * @return RMSD value
-	 */
-	static double rmsd(Spacer* mod1, Spacer* mod2, AtomCode atom){
-		if (mod2->size() != mod1->size())
-			ERROR("Reference protein spacer has a different number of Aminos",exception);
-		double rmsd = 0;
-		for (unsigned int i = 0; i < mod2->size(); i++){	//foreach Amino
-			if (mod2->getAmino(i).getType() != mod1->getAmino(i).getType())
-				ERROR("Aminos order in the two sequences is not the same",exception);
-			Atom& mAtom = mod1->getAmino(i).getAtom(atom);
-			Atom& refAtom = mod2->getAmino(i).getAtom(atom);
 
-			rmsd += (mAtom.getCoords() - refAtom.getCoords()).square();
-		}
-		rmsd = sqrt(rmsd / mod2->size());
-		return rmsd;
-	}
-
-	/**
-	 * Calculate the rmsd distance given a distance vector.
-	 * @param distance distance vector
-	 * @return (double) RMSD value
-	 */
-	static double rmsd(vector<double>& distance){
-		double rmsd = 0;
-		for (unsigned int i = 0; i < distance.size(); i++)	//foreach Amino
-			rmsd += distance[i] * distance[i];
-		rmsd = sqrt(rmsd / distance.size());
-		return rmsd;
-	}
 
 	/**
 	 * Sort models from the most representative to the least one.\n
@@ -233,7 +199,7 @@ public:
 
 		output << "REMARK   1 Victor Mobi Mobility PDB output\n";
 		output << "REMARK   1 Occupancy field has been replaced by scaled distance deviations\n";
-		output << "REMARK   1 B-Factor field has been replaced by average scaled distance\n";
+		output << "REMARK   1 T-Factor field has been replaced by average scaled distance\n";
 		for (unsigned int m = 0; m < order.size(); m++){	//Foreach model
 			output << "MODEL     " << prot->getModelsID()[order[m]] << "\n";
 			int aminoOffset = 0; //prot->getModel(m)->getStartOffset();
@@ -275,7 +241,7 @@ public:
 		vector<double> dev = score.getSDDevs();
 		vector<double> phi = score.getPhiAngles().mean();
 		vector<double> psi = score.getPsiAngles().mean();
-		vector<double> rmsd = score.getDistances().residueRMSD();
+		vector<double> rmsd = score.getDistances().mobilityIndex();
 		vector<int> mobi = score.getMobiMobility();
 		if (output == cout)
 			output << "Mobi Mobility Score" << endl;

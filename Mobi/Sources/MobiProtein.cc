@@ -56,3 +56,11 @@ vector<unsigned int> MobiProtein::load(PdbLoader& pl){
 Spacer* MobiProtein::getModel(unsigned int model){
 	return this->getSpacer(model);
 }
+
+Spacer* MobiProtein::getModelByPdbID(unsigned int model){
+	for (unsigned int i = 0; i < modelsID.size(); i++)
+		if (model == modelsID[i])
+			return this->getSpacer(i);
+	ERROR("The specified model (PDB id) is not loaded in this object",exception);
+	return 0;
+}

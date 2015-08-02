@@ -43,17 +43,17 @@ public:
 	static CppUnit::Test *suite() {
 	        CppUnit::TestSuite *suiteOfTests = new CppUnit::TestSuite("TestVectorCollection");
 
-//	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test1 - Populate the collection",
-//	                &TestVectorCollection::testPopulation));
-//
-//	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test2 - Calculate means",
-//	                &TestVectorCollection::testMeanSD));
-//
-//	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test3 - Calculate standard deviation",
-//	                &TestVectorCollection::testSD));
+	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test1 - Populate the collection",
+	                &TestVectorCollection::testPopulation));
+
+	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test2 - Calculate means",
+	                &TestVectorCollection::testMeanSD));
 
 	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test3 - Calculate standard deviation",
-	        	                &TestVectorCollection::testRMSD));
+	                &TestVectorCollection::testSD));
+
+	        suiteOfTests->addTest(new CppUnit::TestCaller<TestVectorCollection>("Test4 - Calculate mobility index",
+	        	                &TestVectorCollection::testMobilityIndex));
 
 	        return suiteOfTests;
 	    }
@@ -79,6 +79,9 @@ protected:
 
 		vector<int> ids = sdr.getModels();
 		CPPUNIT_ASSERT(ids.size() == 6);
+
+		CPPUNIT_ASSERT(sdr.getValuesByModel(4).size() == 2);
+		CPPUNIT_ASSERT(sdr.getValuesByModel(1).size() == 1);
 	}
 
 	void testMeanSD(){
@@ -99,12 +102,12 @@ protected:
 			CPPUNIT_ASSERT(sd[i] = sqrt(2));
 	}
 
-	void testRMSD(){
+	void testMobilityIndex(){
+		cout << endl << ">>>\tTestVectorCollection >>> test mobility index..." << endl;
 		VectorCollection<double> sdr = VectorCollection<double>();
 		fillWith5Results10(sdr);
-		vector<double> sd = sdr.residueRMSD();
-		for (unsigned int i = 0; i < sd.size(); i++)
-			cout << sd[i] << endl;
+		vector<double> sd = sdr.mobilityIndex();
+		CPPUNIT_ASSERT(sd[0] > 2.44 && sd[0] < 2.45);
 	}
 
 private:

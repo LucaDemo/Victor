@@ -242,7 +242,7 @@ public:
 	const VectorCollection<double>& getPsiAngles(){return psiAngles;}
 
 	/**
-	 * Return true if mobi calculation has been performed in this object.
+	 * Return true if mobi calculation has been performed
 	 * @return true if mobi mobility is calculated, false otherwise
 	 */
 	bool isDone(){

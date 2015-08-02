@@ -31,6 +31,7 @@
 #include <MobiMethods.h>
 #include <MobiUtils.h>
 #include <AtomCode.h>
+#include <VectorCollection.h>
 
 using namespace std;
 using namespace Victor::Mobi;
@@ -55,8 +56,8 @@ public:
 	        suiteOfTests->addTest(new CppUnit::TestCaller<TestMobiMethods>("Test3 - Filters",
 					&TestMobiMethods::testFilters));
 
-	        suiteOfTests->addTest(new CppUnit::TestCaller<TestMobiMethods>("Test4 - Complete Mobi test",
-	                &TestMobiMethods::testMobiMobility));
+//	        suiteOfTests->addTest(new CppUnit::TestCaller<TestMobiMethods>("Test4 - Complete Mobi test",
+//	                &TestMobiMethods::testMobiMobility));
 
 	        return suiteOfTests;
 
@@ -98,6 +99,22 @@ protected:
 		vector<double> sd = sDist.mean();
 		vector<double> sdsd = sDist.stdDev();
 		CPPUNIT_ASSERT(sd[0] > 0.106 && sd[0] < 0.107);
+
+//		cout << "isDone()" << mm.isDone() << endl;
+//		vector<int> mobilityTrack = mm.mobiMobility(prot,tm);
+//		cout << "isDone()" << mm.isDone() << endl;
+//		VectorCollection<double> scDist = mm.getScaledDistances();
+//		vector<double> scDistVals = scDist.mean();
+//		vector<int> track0 = mm.getPsiMobility();
+//		for (unsigned int i = 0; i < track0.size(); i++)
+//			cout << track0[i];
+//		cout << endl;
+//		VectorCollection<double> psiAngles;
+//		MobiMethods::psis(prot,psiAngles);
+//		vector<double> psiDevs = psiAngles.stdDev();
+//		for (unsigned int i = 0; i < psiDevs.size(); i++)
+//			cout << (psiDevs[i] > 20 ? 1 : 0);
+//		cout << endl;
 	}
 
 

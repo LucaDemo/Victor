@@ -56,7 +56,7 @@ namespace Victor { namespace Mobi {
 		/**
 		 * Get the specified model in this Protein.
 		 * @param model (unsigned int) the model internal id (not original Pdb model name) to get
-		 * @return (Spacer&) the model
+		 * @return the model
 		 */
 		Spacer* getModel(unsigned int model);
 
@@ -72,7 +72,14 @@ namespace Victor { namespace Mobi {
 		 * Returns all original (as PDB) loaded modell ids.
 		 * @return vector containing original Pdb ids of loaded models. Vector index matches internal id.
 		 */
-		const vector<unsigned int>& getModelsID(){ return modelsID;}
+		const vector<unsigned int> getModelsID(){ return modelsID;}
+
+		/**
+		 * Returns the the model by its pdb ID
+		 * @param model (unsigned int) the model pdb id
+		 * @return the model
+		 */
+		Spacer* getModelByPdbID(unsigned int model);
 
 	private:
 		bool verbose;
