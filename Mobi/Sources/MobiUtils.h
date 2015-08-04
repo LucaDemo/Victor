@@ -78,8 +78,6 @@ public:
 	}
 
 
-
-
 	/**
 	 * Sort models from the most representative to the least one.\n
 	 * Models are searched using in the protein provided by applying superimposition and calculatin all the RMSD between model pairs.
@@ -150,6 +148,8 @@ public:
 	 * @param output reference to output stream, default is cout
 	 */
 	static void printFastaFile(MobiMethods& mobi, ostream& output = cout){
+		if (!mobi.isDone())
+			ERROR("Cannot save score of a non-done MobiMethod object",exception);
 		if (output == cout){	//if output is cout, add more informations
 			output << "Victor Mobi Mobility results." << endl;
 			output << "d0 scaling value \t\td0 = " << mobi.getD0() << endl;
@@ -234,8 +234,15 @@ public:
 	}
 
 
-
+	/**
+	 * Saves mobility scores.
+	 * @param score MobiMethod object with calculated mobility
+	 * @param chain char value for chain name
+	 * @param output output stream, default is cout
+	 */
 	static void saveScore(MobiMethods& score, char chain, ostream& output = cout){
+		if (!score.isDone())
+			ERROR("Cannot save score of a non-done MobiMethod object",exception);
 		vector<char> seq = score.getSequence();
 		vector<double> avg = score.getSDMeans();
 		vector<double> dev = score.getSDDevs();

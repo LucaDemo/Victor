@@ -78,8 +78,7 @@ protected:
 
 	    //calling TMScore bin
 	    TMScoreBin tmsb(TMDir+"TMScore", TMDir, false);
-	    MobiProtein* superImposed;
-	    tmsb.TMScore(prot,0,1,&superImposed);
+	    MobiProtein* superImposed = tmsb.TMScore(prot,0,1);
 
 
 	    //save superimposed model to file

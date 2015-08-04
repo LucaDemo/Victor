@@ -75,7 +75,7 @@ namespace Victor { namespace Mobi {
 		const vector<unsigned int> getModelsID(){ return modelsID;}
 
 		/**
-		 * Returns the the model by its pdb ID
+		 * Returns the the model by its original pdb ID
 		 * @param model (unsigned int) the model pdb id
 		 * @return the model
 		 */

@@ -30,34 +30,34 @@ using namespace Victor::Mobi;
 namespace Victor { namespace Mobi {
 	/**
 	 * @brief base class that represent a binder to TMScore functionalities.\n
-	 * Class that extends TMScoreBinder must provide reimplementation for methods
+	 * Class that extends TMScoreBinder must provide reimplementation for virtual methods and can be used in Mobi as Interfaces to TMScore imposition
 	 */
 	class TMScoreBinder{
 	public:
 
 		/**
 		 * @brief Given a MobiProtein superimpose two models contained in it.
-		 * The superimposed (rotated/traslated) model is then loaded in a ProteinModel using the double pointer provided.
+		 * The superimposed (rotated/traslated) model is then loaded in the heap and pointer is returned.
 		 * @param prot (MobiProtein&) reference to ProteinModel object
 		 * @param model1 (unsigned int) model#1 name in ProteinModel object
 		 * @param model2 (unsigned int) model#2 name in ProteinModel object
-		 * @param imposedModel (MobiProtein**) double pointer of type ProteinModel, as output
+		 * @return MobiProtein reference containing the super imposed model
 		 */
-		virtual double TMScore(MobiProtein& prot, unsigned int model1, unsigned int model2, MobiProtein** imposedModel){
+		virtual MobiProtein* TMScore(MobiProtein& prot, unsigned int model1, unsigned int model2){
 			ERROR("Unimplemented Method TMImpose(ProteinModel&, uint, uint, ProteinModel**)!",exception);
 			return 0;
 		}
 
 		/**
 		 * @brief Superimposition of two models
-		 * The superimposed (rotated/traslated) model is then loaded in a ProteinModel using the double pointer provided.
+		 * The superimposed (rotated/traslated) model is then loaded in the heap and pointer is returned.
 		 * @param prot1 (MobiProtein&) reference to the fist ProteinModel
 		 * @param model1 (unsigned int) model#1 name in the first ProteinModel object
 		 * @param prot2 (MobiProtein&) reference to the second ProteinModel
 		 * @param model2 (unsigned int) model#2 name in the second ProteinModel object
-		 * @param imposedModel (MobiProtein**) double pointer of type ProteinModel, as output
+		 * @return MobiProtein reference containing the super imposed model
 		 */
-		virtual double TMScore(MobiProtein& prot1, unsigned int model1, MobiProtein& prot2, unsigned int model2, MobiProtein** imposedModel){
+		virtual MobiProtein* TMScore(MobiProtein& prot1, unsigned int model1, MobiProtein& prot2, unsigned int model2){
 			ERROR("Unimplemented Method TMImpose (ProteinModel&, uint, ProteinModel&, uint, ProteinModel**)!",exception);
 			return 0;
 		}

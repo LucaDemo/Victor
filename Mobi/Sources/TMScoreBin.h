@@ -59,37 +59,35 @@ namespace Victor { namespace Mobi {
 		/**
 		 * @brief Given two pdb files containing each a model of the same protein,
 		 * call TMScore binary to superimpose the first over the second. The superimposed (rotated/traslated)
-		 * model is then loaded in a MobiProtein using the double pointer provided.
+		 * model is then loaded in a MobiProtein and a pointer is returned.
 		 * @param model1 full path to model#1 file
 		 * @param model2 full path to model#2 file
-		 * @param imposedModel output
-		 * @return TMScore
+		 * @return MobiProtein reference containing the super imposed model
 		 */
-		virtual double TMScore(string model1, string model2, MobiProtein** imposedModel);
+		virtual MobiProtein* TMScore(string model1, string model2);
 
 		/**
 		 * @brief Given a ProteinModel call TMScore binary to superimpose two models contained in it.
-		 * The superimposed (rotated/traslated) model is then loaded in a ProteinModel using the double pointer provided.
+		 * The superimposed (rotated/traslated)model is then loaded in a MobiProtein and a pointer is returned.
 		 * @param prot reference to MobiProtein object
-		 * @param model1 model#1 name in MobiProtein object
-		 * @param model2 model#2 name in MobiProtein object
+		 * @param model1 model#1 index in MobiProtein object
+		 * @param model2 model#2 index in MobiProtein object
 		 * @param imposedModel output
-		 * @return (double) TMScore
+		 * @return MobiProtein reference containing the super imposed model
 		 */
-		virtual double TMScore(MobiProtein& prot, unsigned int model1, unsigned int model2, MobiProtein** imposedModel);
+		virtual MobiProtein* TMScore(MobiProtein& prot, unsigned int model1, unsigned int model2);
 
 
 		/**
 		 * @brief Superimposition of two models through call to TMScore binary
-		 * The superimposed (rotated/traslated) model is then loaded in a ProteinModel using the double pointer provided.
+		 * The superimposed (rotated/traslated)model is then loaded in a MobiProtein and a pointer is returned.
 		 * @param prot1 reference to the fist ProteinModel
 		 * @param model1 model#1 name in the first ProteinModel object
 		 * @param prot2  reference to the second ProteinModel
 		 * @param model2 model#2 name in the second ProteinModel object
-		 * @param imposedModel output
-		 * @return (double) TMScore
+		 * @return MobiProtein reference containing the super imposed model
 		 */
-		virtual double TMScore(MobiProtein& prot1, unsigned int model1, MobiProtein& prot2, unsigned int model2, MobiProtein** imposedModel);
+		virtual MobiProtein* TMScore(MobiProtein& prot1, unsigned int model1, MobiProtein& prot2, unsigned int model2);
 
 
 		/**
@@ -102,7 +100,7 @@ namespace Victor { namespace Mobi {
 		}
 
 		/**
-		 * Cleans temporary files
+		 * Delete temporary files
 		 */
 		void cleanup();
 

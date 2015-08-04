@@ -55,7 +55,7 @@ void MobiMethods::distances(MobiProtein* protein, TMScoreBinder* tm, VectorColle
 	//Perform superimposition for every model pair
 	for (unsigned int i = 0; i < protein->size(); i++)
 		for (unsigned int j = i+1; j < protein->size(); j++){
-			tm->TMScore(*protein,i,j,&imposed);
+			imposed = tm->TMScore(*protein,i,j);
 			tmpDist = scaledDistance(imposed->getModel(0),protein->getModel(j), mm.getAtom(), mm.getD0());
 			scaledDist.addValue(i,j, tmpDist);
 			tmpDist = distance(imposed->getModel(0),protein->getModel(j), mm.getAtom());

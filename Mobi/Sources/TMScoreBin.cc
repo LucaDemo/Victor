@@ -36,7 +36,6 @@ using namespace Victor::Mobi;
 using namespace Victor::Biopool;
 using namespace std;
 
-
 const string TMTMP_IN1 = "tmin1.pdb.tmp";
 const string TMTMP_IN2 = "tmin2.pdb.tmp";
 const string TMTMP_OUT = "tmout.pdb.tmp";
@@ -47,10 +46,10 @@ const string TMTMP_OUT = "tmout.pdb.tmp";
  * @param pdbFile (string) full path to TMScore output
  * @param imposedModel (ProteinModel**) double pointer of type PRoteinModel, as output
  */
-void spacerFromTMOutput(string pdbFile, MobiProtein** imposedModel);
+MobiProtein* spacerFromTMOutput(string pdbFile);
 
 
-double TMScoreBin::TMScore(MobiProtein& prot1, unsigned int model1, MobiProtein& prot2, unsigned int model2, MobiProtein** imposedModel){
+MobiProtein* TMScoreBin::TMScore(MobiProtein& prot1, unsigned int model1, MobiProtein& prot2, unsigned int model2){
 
 
 	if (verbose)
@@ -68,14 +67,14 @@ double TMScoreBin::TMScore(MobiProtein& prot1, unsigned int model1, MobiProtein&
 	ps.endFile();
 	fout.close();
 	//Call TMScore binary
-	return TMScore((tmp + TMTMP_IN1), (tmp + TMTMP_IN2), imposedModel);
+	return TMScore((tmp + TMTMP_IN1), (tmp + TMTMP_IN2));
 }
 
-double TMScoreBin::TMScore(MobiProtein& prot, unsigned int model1, unsigned int model2, MobiProtein** imposedModel){
-	return TMScore(prot,model1,prot,model2,imposedModel);
+MobiProtein* TMScoreBin::TMScore(MobiProtein& prot, unsigned int model1, unsigned int model2){
+	return TMScore(prot,model1,prot,model2);
 }
 
-double TMScoreBin::TMScore(string model1, string model2, MobiProtein** imposedModel){
+MobiProtein* TMScoreBin::TMScore(string model1, string model2){
 
 	double score = -1;
 	if (access(model1.c_str(), R_OK) == 0 && access(model2.c_str(), R_OK) == 0){
@@ -123,11 +122,11 @@ double TMScoreBin::TMScore(string model1, string model2, MobiProtein** imposedMo
 	else
 		ERROR("No access to pdb files " + model1 + " or " + model2, exception);
 
-	spacerFromTMOutput(tmp + TMTMP_OUT + "_atm", imposedModel);
-	return score;
+	return spacerFromTMOutput(tmp + TMTMP_OUT + "_atm");
+	//return score;
 }
 
-void spacerFromTMOutput(string pdbFile, MobiProtein** imposedModel){
+MobiProtein* spacerFromTMOutput(string pdbFile){
 	if (access(pdbFile.c_str(), R_OK) != 0)
 		ERROR("Cannot read pdb file to fix",exception);
 
@@ -154,10 +153,10 @@ void spacerFromTMOutput(string pdbFile, MobiProtein** imposedModel){
 	PdbLoader pl(buffer);
 	pl.setNoVerbose();
 	//Load and return protein object
-	*imposedModel = new MobiProtein();
+	MobiProtein *protein = new MobiProtein();
 	pl.setModel(1);
-	cout.flush();
-	pl.loadProtein(**imposedModel);
+	pl.loadProtein(*protein);
+	return protein;
 }
 
 void TMScoreBin::cleanup(){
