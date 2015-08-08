@@ -41,10 +41,10 @@ namespace Victor { namespace Mobi {
  * for corresponding (same position) values in different vectors.\n
  * Internally, an id is assigned to each vector. You can specify your own id or use the provided id translator
  * so that, given two (ordered) id values (for example 2 models ids), a unique internal id is assigned to the id pair,
- * then you can:
- * \t- get a list of all the models who partecipate in this collection
- * \t- get vectors related to a model given the model id
- * \t- get the vector related to a model pair
+ * then you can:\n
+ * - get a list of all the models who partecipate in this collection\n
+ * - get vectors related to a model given the model id\n
+ * - get the vector related to a model pair\n
  * \b Attention : all vectors must have the same dimension, the first value added to the collection
  * determines the length of all vectors. You can clear the collection to reset this value.
  */
@@ -56,23 +56,15 @@ public:
 	 * Default constructor
 	 */
 	VectorCollection(){
-		this->results = new std::map<int,std::vector<V> >();
+		this->results = std::map<int,std::vector<V> >();
 		this->safePairID = true;
-	}
-
-	/**
-	 * Destructor
-	 */
-	~VectorCollection(){
-		results->clear();
-		delete results;
 	}
 
 	/**
 	 * Clear the collection deleting all elements in it
 	 */
 	void clear(){
-		results->clear();
+		results.clear();
 		safePairID = true;
 	}
 
@@ -81,11 +73,11 @@ public:
 	 * @param id (int) values id
 	 * @param result (vector<double>&) vector of values
 	 */
-	void addValue(int id, std::vector<V>& result){
+	void addValue(int id, const std::vector<V>& result){
 		if (size() > 0)
 			if (result.size() != vectorsSize())
 				ERROR("Trying to add a result of non compatible size",exception);
-		results->insert(std::make_pair(id,result));
+		results.insert(std::make_pair(id,result));
 		safePairID = false;
 	}
 
@@ -95,11 +87,11 @@ public:
 	 * @param m2 (int) second model id
 	 * @param result (vector<double>&) vector of values
 	 */
-	void addValue(int m1, int m2, std::vector<V>& result){
+	void addValue(int m1, int m2, const std::vector<V>& result){
 		if (size() > 0)
 			if (result.size() != vectorsSize())
 				ERROR("Trying to add a result of non compatible size",exception);
-		results->insert(std::make_pair(VectorCollection::id(m1,m2),result));
+		results.insert(std::make_pair(VectorCollection::id(m1,m2),result));
 	}
 
 	/**
@@ -108,8 +100,8 @@ public:
 	 * @return (vector<double>&) values, if found
 	 */
 	vector<V> getValue(int id){
-		typename std::map<int,std::vector<V> >::const_iterator it = this->results->find(id);
-		if (it != this->results->end())
+		typename std::map<int,std::vector<V> >::const_iterator it = this->results.find(id);
+		if (it != this->results.end())
 			return it->second;
 		else
 			ERROR("Unable to find values with given id",exception);
@@ -124,7 +116,7 @@ public:
 		if (!safePairID)
 			cout << "[VectorCollection] getModels() Warning: vectors has been added with CUSTOM ids!";
 		vector<int> models;
-		for (typename std::map<int,std::vector<V> >::const_iterator it = this->results->begin(); it != this->results->end(); ++it){
+		for (typename std::map<int,std::vector<V> >::const_iterator it = this->results.begin(); it != this->results.end(); ++it){
 			if (std::find(models.begin(), models.end(), VectorCollection::modelsFromID(it->first)[0]) == models.end())
 				models.push_back(VectorCollection::modelsFromID(it->first)[0]);
 			if (std::find(models.begin(), models.end(), VectorCollection::modelsFromID(it->first)[1]) == models.end())
@@ -142,8 +134,9 @@ public:
 		if (!safePairID)
 			cout << "[VectorCollection] getValuesByModel() Warning: vectors has been added with CUSTOM ids!";
 		VectorCollection outVC;
-		typename std::map<int,std::vector<V> >::iterator it = this->results->begin();
-		while (it != this->results->end()){
+		typename std::map<int,std::vector<V> >::const_iterator it = this->results.begin();
+
+		while (it != this->results.end()){
 			if (it->first / delimiter == model)
 				outVC.addValue(it->first, it->second);
 			else
@@ -161,7 +154,7 @@ public:
 	unsigned int vectorsSize() const{
 		if (size() < 1)
 			ERROR("Cannot get model lenght, since there are no models in this SDResult object",exception);
-		return this->results->begin()->second.size();
+		return this->results.begin()->second.size();
 	}
 
 	/**
@@ -169,7 +162,7 @@ public:
 	 * @return (unsigned int) size
 	 */
 	unsigned int size() const{
-		return this->results->size();
+		return this->results.size();
 	}
 
 	/**
@@ -177,7 +170,7 @@ public:
 	 * @return (map::<int,std::vector<double> >) iterator
 	 */
 	typename std::map<int,std::vector<V> >::const_iterator iterator(){
-		return this->results->begin();
+		return this->results.begin();
 	}
 
 	/**
@@ -187,7 +180,7 @@ public:
 	vector<V> mean() const{
 		vector<V> mean = vector<V>(this->vectorsSize(),0.0);
 		typename std::map<int,std::vector<V> >::const_iterator it;
-		for (it = this->results->begin(); it != this->results->end(); ++it)
+		for (it = this->results.begin(); it != this->results.end(); ++it)
 			for (unsigned int a = 0; a < this->vectorsSize(); a++)
 				mean[a] += it->second[a];
 		for (unsigned int a = 0; a < this->vectorsSize(); a++)
@@ -203,7 +196,7 @@ public:
 		vector<V> mean = this->mean();
 		vector<V> sd = vector<V>(this->vectorsSize(),0.0);
 		typename std::map<int,std::vector<V> >::const_iterator it;
-		for (it = this->results->begin(); it != this->results->end(); ++it)	//foreach distance record
+		for (it = this->results.begin(); it != this->results.end(); ++it)	//foreach distance record
 			for (unsigned int a = 0; a < this->vectorsSize(); a++)	//foreach residue
 				sd[a] += pow(it->second[a] - mean[a],2);	//cumulate the 2pow of distance minus mean
 		for (unsigned int a = 0; a < this->vectorsSize(); a++)
@@ -219,21 +212,24 @@ public:
 		V rmsd = 0;
 		V singleRmsd;
 		typename std::map<int,std::vector<V> >::const_iterator it;
-		for (it = this->results->begin(); it != this->results->end(); ++it){	//foreach distance record
+		for (it = this->results.begin(); it != this->results.end(); ++it){	//foreach distance record
 			singleRmsd = 0;
 			for (unsigned int i = 0; i < this->vectorsSize(); i++)	//foreach residue
 				singleRmsd += pow(it->second[i],2);	//cumulate the 2pow of distance
 			singleRmsd = sqrt(singleRmsd / this->vectorsSize());
 			rmsd += singleRmsd;
 		}
-		return (rmsd / results->size());
+		return (rmsd / results.size());
 	}
 
-
+	/**
+	 * Mobility index given this collection of distance vectors.
+	 * @return vector containing mobility indexes per residue
+	 */
 	vector<V> mobilityIndex() const{
 		vector<V> rmsd(vectorsSize(),0);
-		for (typename std::map<int,std::vector<V> >::const_iterator it = this->results->begin();
-				it != this->results->end(); ++it)	//foreach distance record
+		for (typename std::map<int,std::vector<V> >::const_iterator it = this->results.begin();
+				it != this->results.end(); ++it)	//foreach distance record
 			for (unsigned int i = 0; i < this->vectorsSize(); i++){	//foreach residue
 				rmsd[i] += (pow(it->second[i],2) / size());	//cumulate the 2pow of distance
 //				if (i == 0)
@@ -250,7 +246,7 @@ public:
 	 */
 	void print(){
 		typename std::map<int,std::vector<V> >::iterator it;
-		for (it = this->results->begin(); it != this->results->end(); ++it)
+		for (it = this->results.begin(); it != this->results.end(); ++it)
 			cout << it->first << " => [" << it->second[0] << "," << it->second[1] << ", ...]" << endl;
 	}
 
@@ -289,7 +285,7 @@ protected:
 	/**
 	 * Map container for the collection
 	 */
-	std::map<int,std::vector<V> > *results;
+	std::map<int,std::vector<V> > results;
 };
 
 

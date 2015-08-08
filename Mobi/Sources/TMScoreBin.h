@@ -72,7 +72,6 @@ namespace Victor { namespace Mobi {
 		 * @param prot reference to MobiProtein object
 		 * @param model1 model#1 index in MobiProtein object
 		 * @param model2 model#2 index in MobiProtein object
-		 * @param imposedModel output
 		 * @return MobiProtein reference containing the super imposed model
 		 */
 		virtual MobiProtein* TMScore(MobiProtein& prot, unsigned int model1, unsigned int model2);

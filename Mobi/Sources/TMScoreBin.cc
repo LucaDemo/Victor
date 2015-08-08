@@ -36,15 +36,23 @@ using namespace Victor::Mobi;
 using namespace Victor::Biopool;
 using namespace std;
 
+/**
+ * Temporary first model filename
+ */
 const string TMTMP_IN1 = "tmin1.pdb.tmp";
+/**
+ * Temporary second model filename
+ */
 const string TMTMP_IN2 = "tmin2.pdb.tmp";
+/**
+ * Temporary TMscore output pdb
+ */
 const string TMTMP_OUT = "tmout.pdb.tmp";
 
 /**
  * @brief the TMScore output is not pdb conformant. This static method read the output and fix it in a memory buffer.
  * Then loads a ProteinModel with the superimposed model only.
  * @param pdbFile (string) full path to TMScore output
- * @param imposedModel (ProteinModel**) double pointer of type PRoteinModel, as output
  */
 MobiProtein* spacerFromTMOutput(string pdbFile);
 

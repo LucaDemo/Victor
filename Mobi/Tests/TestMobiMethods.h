@@ -56,8 +56,8 @@ public:
 	        suiteOfTests->addTest(new CppUnit::TestCaller<TestMobiMethods>("Test3 - Filters",
 					&TestMobiMethods::testFilters));
 
-//	        suiteOfTests->addTest(new CppUnit::TestCaller<TestMobiMethods>("Test4 - Complete Mobi test",
-//	                &TestMobiMethods::testMobiMobility));
+	        suiteOfTests->addTest(new CppUnit::TestCaller<TestMobiMethods>("Test4 - Complete Mobi test",
+	                &TestMobiMethods::testMobiMobility));
 
 	        return suiteOfTests;
 
