@@ -27,6 +27,7 @@
 
 #include <Spacer.h>
 #include <PdbLoader.h>
+#include <MobiMethods.h>
 #include "../Sources/VectorCollection.h"
 
 using namespace std;
@@ -70,7 +71,7 @@ protected:
 		fillWith5Results10(sdr);
 		CPPUNIT_ASSERT(sdr.size() == 5);
 		CPPUNIT_ASSERT(sdr.vectorsSize() == 10);
-		std::map<int,std::vector<double> >::const_iterator it = sdr.iterator();
+		std::map<int,std::vector<double> >::const_iterator it = sdr.begin();
 		CPPUNIT_ASSERT(it->second[5] == 5);
 		it++;
 		CPPUNIT_ASSERT(it->second[5] == 6);
@@ -106,7 +107,7 @@ protected:
 		cout << endl << ">>>\tTestVectorCollection >>> test mobility index..." << endl;
 		VectorCollection<double> sdr = VectorCollection<double>();
 		fillWith5Results10(sdr);
-		vector<double> sd = sdr.mobilityIndex();
+		vector<double> sd = MobiMethods::mobilityIndex(sdr);
 		CPPUNIT_ASSERT(sd[0] > 2.44 && sd[0] < 2.45);
 	}
 

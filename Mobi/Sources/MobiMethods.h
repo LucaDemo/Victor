@@ -114,6 +114,22 @@ public:
 	 */
 	static vector<int> secondaryMobi(MobiProtein* protein);
 
+
+	/**
+	 * Returns mobility indexes per residue. Static method
+	 * @param distances vectorCollection ("simple" distances)
+	 * @return vector<double> with mobility indexes
+	 */
+	static vector<double> mobilityIndex(VectorCollection<double>& distances);
+
+	/**
+	 * Return mobility indexes per residue
+	 * @return vector<double> with mobility indexes
+	 */
+	vector<double> mobilityIndex(){
+		return MobiMethods::mobilityIndex(dist);
+	}
+
 	/**
 	 * Performs mobility calculation
 	 * @param protein pointer to the protein to process

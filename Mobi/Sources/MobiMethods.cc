@@ -170,6 +170,17 @@ vector<int> MobiMethods::secondaryMobi(MobiProtein* protein){
 }
 
 
+vector<double> MobiMethods::mobilityIndex(VectorCollection<double>& distances){
+	vector<double> mi(distances.vectorsSize(),0);
+	for (typename std::map<int,std::vector<double> >::const_iterator it = distances.begin(); it != distances.end(); ++it)	//foreach distance record
+		for (unsigned int i = 0; i < distances.vectorsSize(); i++)	//foreach residue
+			mi[i] += (pow(it->second[i],2) / distances.size());	//cumulate the 2pow of distance
+	for (unsigned int i = 0; i < mi.size(); i++)
+		mi[i] = sqrt(mi[i]);
+	return mi;
+}
+
+
 
 vector<int> MobiMethods::mobiMobility(MobiProtein* protein, TMScoreBinder* tm){
 	done = false;

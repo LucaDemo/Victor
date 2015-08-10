@@ -248,7 +248,7 @@ public:
 		vector<double> dev = score.getSDDevs();
 		vector<double> phi = score.getPhiAngles().mean();
 		vector<double> psi = score.getPsiAngles().mean();
-		vector<double> rmsd = score.getDistances().mobilityIndex();
+		vector<double> mi = score.mobilityIndex();
 		vector<int> mobi = score.getMobiMobility();
 		if (output == cout)
 			output << "Mobi Mobility Score" << endl;
@@ -258,7 +258,7 @@ public:
 			<< setw(6) << fixed << setprecision(2) << dev[i] << "\t"
 			<< setw(6) << fixed << setprecision(2) << phi[i] << "\t"
 			<< setw(6) << fixed << setprecision(2) << psi[i] << "\t"
-			<< setw(6) << fixed << setprecision(2) << rmsd[i] << endl;
+			<< setw(6) << fixed << setprecision(2) << mi[i] << endl;
 		}
 	}
 };
